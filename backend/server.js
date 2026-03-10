@@ -5,6 +5,7 @@ import propertyRoutes from './routes/propertyRoutes.js';
 import leadRoutes from './routes/leadRoutes.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { ensureStorageBucket } from './supabaseClient.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -27,10 +28,9 @@ app.get('/api/health', (req, res) => {
 app.use('/api/properties', propertyRoutes);
 app.use('/api/leads', leadRoutes);
 
-// Serve Static Files
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
+  await ensureStorageBucket('properties');
 });

@@ -1,4 +1,5 @@
 import prisma from '../prismaClient.js';
+import { supabase } from '../supabaseClient.js';
 
 // @desc    Fetch all properties
 // @route   GET /api/properties
@@ -49,7 +50,28 @@ export const createProperty = async (req, res) => {
     }
     
     if (req.files && req.files.length > 0) {
-      const fileUrls = req.files.map(file => `${req.protocol}://${req.get('host')}/uploads/${file.filename}`);
+      const uploadPromises = req.files.map(async (file) => {
+        const fileName = `${Date.now()}-${file.originalname.replace(/\s+/g, '-')}`;
+        const { data, error } = await supabase.storage
+          .from('properties')
+          .upload(fileName, file.buffer, {
+            contentType: file.mimetype,
+            upsert: false
+          });
+
+        if (error) {
+           console.error('Supabase upload error:', error);
+           throw new Error('Failed to upload image to Supabase');
+        }
+
+        const { data: publicUrlData } = supabase.storage
+          .from('properties')
+          .getPublicUrl(fileName);
+
+        return publicUrlData.publicUrl;
+      });
+
+      const fileUrls = await Promise.all(uploadPromises);
       parsedImages = [...parsedImages, ...fileUrls];
     }
 
@@ -100,7 +122,28 @@ export const updateProperty = async (req, res) => {
          parsedImages = [...parsedImages, ...incomingImages];
       }
       if (req.files && req.files.length > 0) {
-        const fileUrls = req.files.map(file => `${req.protocol}://${req.get('host')}/uploads/${file.filename}`);
+        const uploadPromises = req.files.map(async (file) => {
+          const fileName = `${Date.now()}-${file.originalname.replace(/\s+/g, '-')}`;
+          const { data, error } = await supabase.storage
+            .from('properties')
+            .upload(fileName, file.buffer, {
+              contentType: file.mimetype,
+              upsert: false
+            });
+
+          if (error) {
+             console.error('Supabase upload error:', error);
+             throw new Error('Failed to upload image to Supabase');
+          }
+
+          const { data: publicUrlData } = supabase.storage
+            .from('properties')
+            .getPublicUrl(fileName);
+
+          return publicUrlData.publicUrl;
+        });
+
+        const fileUrls = await Promise.all(uploadPromises);
         parsedImages = [...parsedImages, ...fileUrls];
       }
 
