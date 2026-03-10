@@ -1,0 +1,380 @@
+import React, { useState, useEffect } from 'react';
+import { FiUsers, FiHome, FiTrendingUp, FiLogOut, FiEdit2, FiTrash2 } from 'react-icons/fi';
+import SEO from '../../components/seo/SEO';
+import '../Properties/Properties.css';
+
+const AgentDashboard = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
+  const [activeTab, setActiveTab] = useState('leads');
+  const [leads, setLeads] = useState([]);
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [propLoading, setPropLoading] = useState(false);
+  const [showAddProp, setShowAddProp] = useState(false);
+  const [newProp, setNewProp] = useState({
+    title: '', description: '', price: '', location: '', propertyType: 'Villa', investmentType: 'High ROI', images: '', amenities: '', mapLocation: '', isFeatured: false
+  });
+
+  // Simple mock auth for MVP
+  const handleLogin = (e) => {
+    e.preventDefault();
+    if (password === 'admin123') { // Hardcoded for demo
+      setIsAuthenticated(true);
+      fetchLeads();
+      fetchProperties();
+    } else {
+      alert('Invalid password. For demo, use: admin123');
+    }
+  };
+
+  const fetchLeads = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/leads`);
+      if (response.ok) {
+        const data = await response.json();
+        setLeads(data);
+      } else {
+        // Fallback to mock data if backend not running
+        setMockLeads();
+      }
+    } catch (error) {
+      console.error('Error fetching leads:', error);
+      setMockLeads();
+    }
+    setLoading(false);
+  };
+
+  const fetchProperties = async () => {
+    setPropLoading(true);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/properties`);
+      if (response.ok) {
+        const data = await response.json();
+        setProperties(data);
+      }
+    } catch (error) {
+      console.error('Error fetching properties:', error);
+    }
+    setPropLoading(false);
+  };
+
+  const handleDeleteProperty = async (id) => {
+    if (window.confirm('Are you sure you want to delete this property?')) {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/properties/${id}`, {
+          method: 'DELETE'
+        });
+        if (response.ok) {
+          setProperties(properties.filter(p => p._id !== id));
+        }
+      } catch (error) {
+        console.error('Error deleting property:', error);
+      }
+    }
+  };
+
+  const handleAddProperty = async (e) => {
+    e.preventDefault();
+    try {
+      const propData = {
+        ...newProp,
+        price: Number(newProp.price),
+        images: newProp.images.split(',').map(i => i.trim()),
+        amenities: newProp.amenities.split(',').map(a => a.trim()),
+      };
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/properties`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(propData)
+      });
+      if (response.ok) {
+        const added = await response.json();
+        setProperties([...properties, added]);
+        setShowAddProp(false);
+        setNewProp({ title: '', description: '', price: '', location: '', propertyType: 'Villa', investmentType: 'High ROI', images: '', amenities: '', mapLocation: '', isFeatured: false });
+      } else {
+        alert('Error adding property. Check console.');
+      }
+    } catch (error) {
+      console.error('Error adding property:', error);
+    }
+  };
+
+  const setMockLeads = () => {
+    setLeads([
+      { _id: '1', name: 'John Doe', phone: '555-0101', email: 'john@example.com', propertyType: 'Villa', budget: '₹10Cr - ₹20Cr', status: 'New', createdAt: new Date().toISOString() },
+      { _id: '2', name: 'Sarah Smith', phone: '555-0202', email: 'sarah@example.com', propertyType: 'Any', budget: 'Above ₹20Cr', status: 'Follow Up', createdAt: new Date(Date.now() - 86400000).toISOString() },
+      { _id: '3', name: 'Mike Johnson', phone: '555-0303', email: 'mike@example.com', propertyType: 'Plot', budget: 'Under ₹5Cr', status: 'Converted', createdAt: new Date(Date.now() - 172800000).toISOString() },
+    ]);
+  };
+
+  const updateLeadStatus = async (id, newStatus) => {
+    // Optimistic UI update
+    setLeads(leads.map(lead => lead._id === id ? { ...lead, status: newStatus } : lead));
+    
+    try {
+      await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/leads/${id}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+    } catch (error) {
+      console.error('Error updating lead:', error);
+    }
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="section" style={{ minHeight: 'calc(100vh - 80px)', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--bg-color)' }}>
+        <SEO title="Agent Login" />
+        <div style={{ backgroundColor: 'var(--surface)', padding: '3rem', borderRadius: '1rem', width: '100%', maxWidth: '400px', boxShadow: 'var(--shadow-lg)', textAlign: 'center' }}>
+          <h1 style={{ color: 'var(--primary)', marginBottom: '1rem', fontSize: '2rem' }}>Agent Login</h1>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>Secure portal for Prime Estates agents.</p>
+          
+          <form onSubmit={handleLogin}>
+            <div className="input-group">
+              <input 
+                type="password" 
+                className="input-field" 
+                placeholder="Enter admin password (demo: admin123)" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Login to Dashboard</button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-gray" style={{ minHeight: 'calc(100vh - 80px)', backgroundColor: '#f1f5f9' }}>
+      <SEO title="Agent CRM Dashboard" />
+      
+      {/* Top Navbar for CRM */}
+      <div style={{ backgroundColor: 'var(--primary)', color: 'var(--surface)', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h2 style={{ fontSize: '1.25rem', margin: 0 }}>Prime Estates CRM</h2>
+        <button 
+          onClick={() => setIsAuthenticated(false)} 
+          style={{ background: 'none', border: 'none', color: 'var(--surface)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1rem' }}
+        >
+          <FiLogOut /> Logout
+        </button>
+      </div>
+
+      <div className="container" style={{ display: 'flex', gap: '2rem', padding: '2rem 1.5rem', alignItems: 'flex-start' }}>
+        
+        {/* Sidebar */}
+        <div style={{ width: '250px', backgroundColor: 'var(--surface)', borderRadius: '0.5rem', padding: '1.5rem', boxShadow: 'var(--shadow-sm)', flexShrink: 0 }}>
+          <ul style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <li>
+              <button 
+                onClick={() => setActiveTab('dashboard')}
+                style={{ width: '100%', textAlign: 'left', padding: '0.75rem 1rem', borderRadius: '0.375rem', border: 'none', display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', backgroundColor: activeTab === 'dashboard' ? 'var(--bg-color)' : 'transparent', color: activeTab === 'dashboard' ? 'var(--primary)' : 'var(--text-secondary)', fontWeight: activeTab === 'dashboard' ? '600' : '400' }}
+              >
+                <FiTrendingUp /> Overview
+              </button>
+            </li>
+            <li>
+              <button 
+                onClick={() => setActiveTab('leads')}
+                style={{ width: '100%', textAlign: 'left', padding: '0.75rem 1rem', borderRadius: '0.375rem', border: 'none', display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', backgroundColor: activeTab === 'leads' ? 'var(--bg-color)' : 'transparent', color: activeTab === 'leads' ? 'var(--primary)' : 'var(--text-secondary)', fontWeight: activeTab === 'leads' ? '600' : '400' }}
+              >
+                <FiUsers /> Manage Leads
+              </button>
+            </li>
+            <li>
+              <button 
+                onClick={() => setActiveTab('properties')}
+                style={{ width: '100%', textAlign: 'left', padding: '0.75rem 1rem', borderRadius: '0.375rem', border: 'none', display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', backgroundColor: activeTab === 'properties' ? 'var(--bg-color)' : 'transparent', color: activeTab === 'properties' ? 'var(--primary)' : 'var(--text-secondary)', fontWeight: activeTab === 'properties' ? '600' : '400' }}
+              >
+                <FiHome /> Properties
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        {/* Main Content Area */}
+        <div style={{ flexGrow: 1, backgroundColor: 'var(--surface)', borderRadius: '0.5rem', padding: '2rem', boxShadow: 'var(--shadow-sm)', minHeight: '600px', overflowX: 'auto' }}>
+          
+          {activeTab === 'dashboard' && (
+            <div>
+              <h3 style={{ fontSize: '1.5rem', color: 'var(--primary)', marginBottom: '1.5rem' }}>Dashboard Overview</h3>
+              <p style={{ color: 'var(--text-secondary)' }}>Welcome back. Here is a quick snapshot of your CRM.</p>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginTop: '2rem' }}>
+                <div style={{ padding: '1.5rem', backgroundColor: '#f8fafc', borderRadius: '0.5rem', borderLeft: '4px solid var(--secondary)' }}>
+                  <div style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginBottom: '0.5rem' }}>Total Leads</div>
+                  <div style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--primary)' }}>{leads.length}</div>
+                </div>
+                <div style={{ padding: '1.5rem', backgroundColor: '#f8fafc', borderRadius: '0.5rem', borderLeft: '4px solid #10B981' }}>
+                  <div style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginBottom: '0.5rem' }}>New Inquiries</div>
+                  <div style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--primary)' }}>{leads.filter(l => l.status === 'New').length}</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'leads' && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                <h3 style={{ fontSize: '1.5rem', color: 'var(--primary)' }}>Lead Management</h3>
+                <button className="btn btn-outline" onClick={fetchLeads}>Refresh</button>
+              </div>
+
+              {loading ? (
+                <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-secondary)' }}>Loading leads...</div>
+              ) : (
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '2px solid var(--border-color)', color: 'var(--text-secondary)' }}>
+                      <th style={{ padding: '1rem', fontWeight: '600' }}>Name</th>
+                      <th style={{ padding: '1rem', fontWeight: '600' }}>Contact</th>
+                      <th style={{ padding: '1rem', fontWeight: '600' }}>Interest</th>
+                      <th style={{ padding: '1rem', fontWeight: '600' }}>Budget</th>
+                      <th style={{ padding: '1rem', fontWeight: '600' }}>Date</th>
+                      <th style={{ padding: '1rem', fontWeight: '600' }}>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {leads.map(lead => (
+                      <tr key={lead._id} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                        <td style={{ padding: '1rem', fontWeight: '500' }}>{lead.name}</td>
+                        <td style={{ padding: '1rem' }}>
+                          <div style={{ fontSize: '0.875rem', color: 'var(--primary)' }}>{lead.phone}</div>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{lead.email}</div>
+                        </td>
+                        <td style={{ padding: '1rem', fontSize: '0.875rem' }}>{lead.propertyType}</td>
+                        <td style={{ padding: '1rem', fontSize: '0.875rem' }}>{lead.budget}</td>
+                        <td style={{ padding: '1rem', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                          {new Date(lead.createdAt).toLocaleDateString()}
+                        </td>
+                        <td style={{ padding: '1rem' }}>
+                          <select 
+                            value={lead.status}
+                            onChange={(e) => updateLeadStatus(lead._id, e.target.value)}
+                            style={{ 
+                              padding: '0.25rem 0.5rem', 
+                              borderRadius: '0.25rem', 
+                              border: '1px solid var(--border-color)', 
+                              backgroundColor: lead.status === 'New' ? '#FEE2E2' : lead.status === 'Converted' ? '#D1FAE5' : '#FEF3C7',
+                              color: lead.status === 'New' ? '#991B1B' : lead.status === 'Converted' ? '#065F46' : '#92400E',
+                              fontWeight: '600',
+                              fontSize: '0.75rem',
+                              outline: 'none',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            <option value="New">New</option>
+                            <option value="Contacted">Contacted</option>
+                            <option value="Follow Up">Follow Up</option>
+                            <option value="Qualified">Qualified</option>
+                            <option value="Converted">Converted</option>
+                            <option value="Lost">Lost</option>
+                          </select>
+                        </td>
+                      </tr>
+                    ))}
+                    {leads.length === 0 && (
+                      <tr>
+                        <td colSpan="6" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>No leads found.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'properties' && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                <h3 style={{ fontSize: '1.5rem', color: 'var(--primary)' }}>Property Management</h3>
+                <button className="btn btn-primary" onClick={() => setShowAddProp(!showAddProp)}>
+                  {showAddProp ? 'Cancel' : '+ Add Property'}
+                </button>
+              </div>
+
+              {showAddProp && (
+                <div style={{ padding: '2rem', backgroundColor: '#f8fafc', borderRadius: '0.5rem', marginBottom: '2rem' }}>
+                  <h4 style={{ marginBottom: '1rem', color: 'var(--primary)' }}>Add New Property</h4>
+                  <form onSubmit={handleAddProperty} style={{ display: 'grid', gap: '1rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                      <input type="text" placeholder="Title" required className="input-field" value={newProp.title} onChange={e => setNewProp({...newProp, title: e.target.value})} />
+                      <input type="number" placeholder="Price (INR)" required className="input-field" value={newProp.price} onChange={e => setNewProp({...newProp, price: e.target.value})} />
+                    </div>
+                    <input type="text" placeholder="Location" required className="input-field" value={newProp.location} onChange={e => setNewProp({...newProp, location: e.target.value})} />
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+                      <select className="input-field" value={newProp.propertyType} onChange={e => setNewProp({...newProp, propertyType: e.target.value})}>
+                        <option value="Villa">Villa</option>
+                        <option value="Apartment">Apartment</option>
+                        <option value="Commercial">Commercial</option>
+                        <option value="Plot">Plot</option>
+                      </select>
+                      <select className="input-field" value={newProp.investmentType} onChange={e => setNewProp({...newProp, investmentType: e.target.value})}>
+                        <option value="High ROI">High ROI</option>
+                        <option value="Long Term">Long Term</option>
+                        <option value="Rental Income">Rental Income</option>
+                      </select>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <input type="checkbox" checked={newProp.isFeatured} onChange={e => setNewProp({...newProp, isFeatured: e.target.checked})} /> Featured
+                      </label>
+                    </div>
+                    <textarea placeholder="Description" required className="input-field" rows="3" value={newProp.description} onChange={e => setNewProp({...newProp, description: e.target.value})}></textarea>
+                    <input type="text" placeholder="Image URLs (comma separated)" required className="input-field" value={newProp.images} onChange={e => setNewProp({...newProp, images: e.target.value})} />
+                    <input type="text" placeholder="Amenities (comma separated)" className="input-field" value={newProp.amenities} onChange={e => setNewProp({...newProp, amenities: e.target.value})} />
+                    <button type="submit" className="btn btn-primary" style={{ width: 'fit-content' }}>Save Property</button>
+                  </form>
+                </div>
+              )}
+
+              {propLoading ? (
+                <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-secondary)' }}>Loading properties...</div>
+              ) : (
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '2px solid var(--border-color)', color: 'var(--text-secondary)' }}>
+                      <th style={{ padding: '1rem', fontWeight: '600' }}>Property</th>
+                      <th style={{ padding: '1rem', fontWeight: '600' }}>Type</th>
+                      <th style={{ padding: '1rem', fontWeight: '600' }}>Price</th>
+                      <th style={{ padding: '1rem', fontWeight: '600' }}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {properties.map(prop => (
+                      <tr key={prop._id} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                        <td style={{ padding: '1rem', fontWeight: '500' }}>
+                          <div>{prop.title}</div>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{prop.location}</div>
+                        </td>
+                        <td style={{ padding: '1rem', fontSize: '0.875rem' }}>{prop.propertyType}</td>
+                        <td style={{ padding: '1rem', fontSize: '0.875rem', fontWeight: '600' }}>{new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(prop.price)}</td>
+                        <td style={{ padding: '1rem' }}>
+                          <button onClick={() => handleDeleteProperty(prop._id)} style={{ padding: '0.25rem 0.5rem', borderRadius: '0.25rem', border: 'none', backgroundColor: '#FEE2E2', color: '#991B1B', cursor: 'pointer', fontSize: '0.75rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                            <FiTrash2 /> Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                    {properties.length === 0 && (
+                      <tr>
+                        <td colSpan="4" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>No properties added yet.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          )}
+
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AgentDashboard;

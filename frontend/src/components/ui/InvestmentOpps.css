@@ -1,0 +1,113 @@
+.invest-section {
+  padding: 6rem 0;
+  background-color: var(--primary);
+  color: var(--surface);
+}
+
+.invest-section .section-title {
+  color: var(--surface);
+}
+
+.invest-section .section-subtitle {
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0;
+}
+
+.invest-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 4rem;
+}
+
+.btn-icon {
+  margin-left: 0.5rem;
+}
+
+.invest-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.invest-card {
+  background-color: var(--surface);
+  border-radius: 1rem;
+  overflow: hidden;
+  color: var(--text-primary);
+  transition: all var(--transition-normal);
+}
+
+.invest-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+.invest-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.invest-card:hover .invest-image {
+  transform: scale(1.05);
+}
+
+.invest-content {
+  padding: 2rem;
+  position: relative;
+}
+
+.roi-badge {
+  position: absolute;
+  top: -1.25rem;
+  right: 2rem;
+  background-color: var(--secondary);
+  color: var(--primary);
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: var(--shadow-md);
+  z-index: 10;
+}
+
+.invest-title {
+  font-size: 1.25rem;
+  margin-bottom: 0.75rem;
+  color: var(--primary);
+  margin-top: 0.5rem;
+}
+
+.invest-description {
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.invest-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--secondary);
+  font-weight: 600;
+  transition: gap var(--transition-fast);
+}
+
+.invest-link:hover {
+  gap: 0.75rem;
+  color: var(--secondary-hover);
+}
+
+@media (max-width: 768px) {
+  .invest-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+}
