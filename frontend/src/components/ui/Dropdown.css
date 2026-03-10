@@ -1,0 +1,104 @@
+.custom-dropdown {
+  position: relative;
+  width: 100%;
+  font-family: 'Inter', sans-serif;
+}
+
+.dropdown-header {
+  padding: 0.875rem 1rem;
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: var(--text-primary, #1E293B);
+  font-size: 0.95rem;
+}
+
+.dropdown-header:hover {
+  border-color: var(--secondary, #C9A227);
+  box-shadow: 0 4px 12px rgba(201, 162, 39, 0.1);
+}
+
+.dropdown-header.open {
+  border-color: var(--secondary, #C9A227);
+  box-shadow: 0 0 0 2px rgba(201, 162, 39, 0.2);
+}
+
+.dropdown-icon {
+  color: var(--secondary, #C9A227);
+  font-size: 1.25rem;
+  transition: transform 0.3s ease;
+}
+
+.dropdown-icon.rotated {
+  transform: rotate(180deg);
+}
+
+.dropdown-list-container {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  width: 100%;
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  z-index: 50;
+  animation: slideDown 0.2s ease-out forwards;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+/* Custom Scrollbar for Dropdown */
+.dropdown-list-container::-webkit-scrollbar {
+  width: 6px;
+}
+.dropdown-list-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+.dropdown-list-container::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 10px;
+}
+
+.dropdown-list {
+  list-style: none;
+  padding: 0.5rem 0;
+  margin: 0;
+}
+
+.dropdown-list-item {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--text-secondary, #475569);
+  font-size: 0.95rem;
+}
+
+.dropdown-list-item:hover {
+  background-color: #f8fafc;
+  color: var(--secondary, #C9A227);
+  padding-left: 1.25rem;
+}
+
+.dropdown-list-item.selected {
+  background-color: rgba(201, 162, 39, 0.1);
+  color: var(--secondary, #C9A227);
+  font-weight: 600;
+  border-left: 3px solid var(--secondary, #C9A227);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

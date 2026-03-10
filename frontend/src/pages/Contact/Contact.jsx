@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FiMapPin, FiPhone, FiMail } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
+import Dropdown from '../../components/ui/Dropdown';
 import SEO from '../../components/seo/SEO';
 import '../Properties/Properties.css';
 
@@ -14,6 +15,14 @@ const Contact = () => {
     message: ''
   });
   const [status, setStatus] = useState('');
+
+  const propertyTypeOptions = [
+    { value: 'Any', label: 'Any Property Type' },
+    { value: 'Plot', label: 'Plots / Land' },
+    { value: 'Villa', label: 'Villas / Houses' },
+    { value: 'Apartment', label: 'Apartments' },
+    { value: 'Commercial', label: 'Commercial Spaces' }
+  ];
 
   const formatBudget = (value) => {
     const num = Number(value);
@@ -171,13 +180,11 @@ const Contact = () => {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
                       <div>
                         <label className="input-label" htmlFor="propertyType">Interested In</label>
-                        <select id="propertyType" name="propertyType" className="input-field" value={formData.propertyType} onChange={handleChange}>
-                          <option value="Any">Any Property Type</option>
-                          <option value="Plot">Plots / Land</option>
-                          <option value="Villa">Villas / Houses</option>
-                          <option value="Apartment">Apartments</option>
-                          <option value="Commercial">Commercial Spaces</option>
-                        </select>
+                        <Dropdown 
+                          options={propertyTypeOptions}
+                          value={formData.propertyType}
+                          onChange={(val) => setFormData({ ...formData, propertyType: val })}
+                        />
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                         <label className="input-label" htmlFor="budget" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

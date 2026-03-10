@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiSearch, FiMapPin } from 'react-icons/fi';
+import Dropdown from './Dropdown';
 import './Hero.css';
 
 const Hero = () => {
@@ -10,6 +11,14 @@ const Hero = () => {
     propertyType: '',
     budget: '50000000', // Default Max 5 Cr
   });
+
+  const propertyTypeOptions = [
+    { value: '', label: 'Property Type' },
+    { value: 'Plot', label: 'Plot' },
+    { value: 'Villa', label: 'Villa' },
+    { value: 'Apartment', label: 'Apartment' },
+    { value: 'Commercial', label: 'Commercial' }
+  ];
 
   const formatBudget = (value) => {
     const num = Number(value);
@@ -63,18 +72,12 @@ const Hero = () => {
             </div>
             
             <div className="search-input-group border-left">
-              <select 
-                name="propertyType" 
+              <Dropdown 
+                options={propertyTypeOptions}
                 value={searchParams.propertyType}
-                onChange={handleChange}
-                className="search-input"
-              >
-                <option value="">Property Type</option>
-                <option value="Plot">Plot</option>
-                <option value="Villa">Villa</option>
-                <option value="Apartment">Apartment</option>
-                <option value="Commercial">Commercial</option>
-              </select>
+                onChange={(val) => setSearchParams({ ...searchParams, propertyType: val })}
+                placeholder="Property Type"
+              />
             </div>
 
             <div className="search-input-group border-left" style={{ display: 'flex', flexDirection: 'column', padding: '0 1rem', justifyContent: 'center', width: '200px' }}>

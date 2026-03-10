@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FiUsers, FiHome, FiTrendingUp, FiLogOut, FiEdit2, FiTrash2 } from 'react-icons/fi';
+import Dropdown from '../../components/ui/Dropdown';
 import SEO from '../../components/seo/SEO';
 import '../Properties/Properties.css';
 
@@ -15,6 +16,28 @@ const AgentDashboard = () => {
   const [newProp, setNewProp] = useState({
     title: '', description: '', price: '', location: '', propertyType: 'Villa', investmentType: 'High ROI', images: '', amenities: '', mapLocation: '', isFeatured: false, imageFiles: []
   });
+
+  const leadStatusOptions = [
+    { value: 'New', label: 'New' },
+    { value: 'Contacted', label: 'Contacted' },
+    { value: 'Follow Up', label: 'Follow Up' },
+    { value: 'Qualified', label: 'Qualified' },
+    { value: 'Converted', label: 'Converted' },
+    { value: 'Lost', label: 'Lost' }
+  ];
+
+  const propertyTypeOptions = [
+    { value: 'Villa', label: 'Villa' },
+    { value: 'Apartment', label: 'Apartment' },
+    { value: 'Commercial', label: 'Commercial' },
+    { value: 'Plot', label: 'Plot' }
+  ];
+
+  const investmentTypeOptions = [
+    { value: 'High ROI', label: 'High ROI' },
+    { value: 'Long Term', label: 'Long Term' },
+    { value: 'Rental Income', label: 'Rental Income' }
+  ];
 
   const formatPrice = (value) => {
     if (!value) return '';
@@ -274,28 +297,13 @@ const AgentDashboard = () => {
                           {new Date(lead.createdAt).toLocaleDateString()}
                         </td>
                         <td style={{ padding: '1rem' }}>
-                          <select 
-                            value={lead.status}
-                            onChange={(e) => updateLeadStatus(lead._id, e.target.value)}
-                            style={{ 
-                              padding: '0.25rem 0.5rem', 
-                              borderRadius: '0.25rem', 
-                              border: '1px solid var(--border-color)', 
-                              backgroundColor: lead.status === 'New' ? '#FEE2E2' : lead.status === 'Converted' ? '#D1FAE5' : '#FEF3C7',
-                              color: lead.status === 'New' ? '#991B1B' : lead.status === 'Converted' ? '#065F46' : '#92400E',
-                              fontWeight: '600',
-                              fontSize: '0.75rem',
-                              outline: 'none',
-                              cursor: 'pointer'
-                            }}
-                          >
-                            <option value="New">New</option>
-                            <option value="Contacted">Contacted</option>
-                            <option value="Follow Up">Follow Up</option>
-                            <option value="Qualified">Qualified</option>
-                            <option value="Converted">Converted</option>
-                            <option value="Lost">Lost</option>
-                          </select>
+                          <div style={{ width: '130px' }}>
+                            <Dropdown 
+                              options={leadStatusOptions}
+                              value={lead.status}
+                              onChange={(val) => updateLeadStatus(lead._id, val)}
+                            />
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -332,17 +340,16 @@ const AgentDashboard = () => {
                     </div>
                     <input type="text" placeholder="Location" required className="input-field" value={newProp.location} onChange={e => setNewProp({...newProp, location: e.target.value})} />
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
-                      <select className="input-field" value={newProp.propertyType} onChange={e => setNewProp({...newProp, propertyType: e.target.value})}>
-                        <option value="Villa">Villa</option>
-                        <option value="Apartment">Apartment</option>
-                        <option value="Commercial">Commercial</option>
-                        <option value="Plot">Plot</option>
-                      </select>
-                      <select className="input-field" value={newProp.investmentType} onChange={e => setNewProp({...newProp, investmentType: e.target.value})}>
-                        <option value="High ROI">High ROI</option>
-                        <option value="Long Term">Long Term</option>
-                        <option value="Rental Income">Rental Income</option>
-                      </select>
+                      <Dropdown 
+                        options={propertyTypeOptions}
+                        value={newProp.propertyType}
+                        onChange={(val) => setNewProp({...newProp, propertyType: val})}
+                      />
+                      <Dropdown 
+                        options={investmentTypeOptions}
+                        value={newProp.investmentType}
+                        onChange={(val) => setNewProp({...newProp, investmentType: val})}
+                      />
                       <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <input type="checkbox" checked={newProp.isFeatured} onChange={e => setNewProp({...newProp, isFeatured: e.target.checked})} /> Featured
                       </label>

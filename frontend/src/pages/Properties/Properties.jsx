@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import SEO from '../../components/seo/SEO';
 import PropertyCard from '../../components/ui/PropertyCard';
+import Dropdown from '../../components/ui/Dropdown';
 import { FiFilter } from 'react-icons/fi';
 import axios from 'axios';
 import './Properties.css';
@@ -18,6 +19,20 @@ const Properties = () => {
     budget: searchParams.get('budget') || '50000000',
     sort: 'newest'
   });
+
+  const propertyTypeOptions = [
+    { value: '', label: 'All Types' },
+    { value: 'Plot', label: 'Plot' },
+    { value: 'Villa', label: 'Villa' },
+    { value: 'Apartment', label: 'Apartment' },
+    { value: 'Commercial', label: 'Commercial' }
+  ];
+
+  const sortOptions = [
+    { value: 'newest', label: 'Newest First' },
+    { value: 'price-low', label: 'Price: Low to High' },
+    { value: 'price-high', label: 'Price: High to Low' }
+  ];
 
   const formatBudget = (value) => {
     const num = Number(value);
@@ -113,18 +128,12 @@ const Properties = () => {
             
             <div className="filter-group">
               <label className="input-label">Property Type</label>
-              <select 
-                name="propertyType" 
-                className="input-field"
+              <Dropdown 
+                options={propertyTypeOptions}
                 value={filters.propertyType}
-                onChange={handleFilterChange}
-              >
-                <option value="">All Types</option>
-                <option value="Plot">Plot</option>
-                <option value="Villa">Villa</option>
-                <option value="Apartment">Apartment</option>
-                <option value="Commercial">Commercial</option>
-              </select>
+                onChange={(val) => setFilters({ ...filters, propertyType: val })}
+                placeholder="All Types"
+              />
             </div>
             
             <div className="filter-group">
@@ -163,16 +172,12 @@ const Properties = () => {
                   <FiFilter /> Filters
                 </button>
                 
-                <select 
-                  name="sort" 
-                  className="input-field sort-select"
+                <Dropdown 
+                  options={sortOptions}
                   value={filters.sort}
-                  onChange={handleFilterChange}
-                >
-                  <option value="newest">Newest First</option>
-                  <option value="price-low">Price: Low to High</option>
-                  <option value="price-high">Price: High to Low</option>
-                </select>
+                  onChange={(val) => setFilters({ ...filters, sort: val })}
+                  className="sort-select"
+                />
               </div>
             </div>
 
