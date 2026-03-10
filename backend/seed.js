@@ -1,6 +1,5 @@
-import mongoose from 'mongoose';
+import prisma from './prismaClient.js';
 import dotenv from 'dotenv';
-import Property from './models/Property.js';
 
 dotenv.config();
 
@@ -95,15 +94,17 @@ const properties = [
 
 const seedDB = async () => {
   try {
-    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/real-estate';
-    await mongoose.connect(mongoUri);
-    console.log('MongoDB connected for seeding...');
+    console.log('Connecting to PostgreSQL via Prisma for seeding...');
 
-    await Property.deleteMany();
-    console.log('Cleared existing properties');
+    // Clear all existing data to prevent duplicates
+    await prisma.property.deleteMany();
+    await prisma.lead.deleteMany();
+    console.log('Cleared existing properties and leads');
 
-    await Property.insertMany(properties);
-    console.log('Inserted luxury dummy properties');
+    await prisma.property.createMany({
+      data: properties
+    });
+    console.log('Inserted luxury dummy properties into PostgreSQL');
 
     process.exit(0);
   } catch (error) {

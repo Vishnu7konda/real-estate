@@ -1,11 +1,13 @@
-import Property from '../models/Property.js';
+import prisma from '../prismaClient.js';
 
 // @desc    Fetch all properties
 // @route   GET /api/properties
 // @access  Public
 export const getProperties = async (req, res) => {
   try {
-    const properties = await Property.find({});
+    const properties = await prisma.property.findMany({
+      orderBy: { createdAt: 'desc' }
+    });
     res.json(properties);
   } catch (error) {
     res.status(500).json({ message: 'Server Error', error: error.message });
@@ -17,7 +19,9 @@ export const getProperties = async (req, res) => {
 // @access  Public
 export const getPropertyById = async (req, res) => {
   try {
-    const property = await Property.findById(req.params.id);
+    const property = await prisma.property.findUnique({
+      where: { id: req.params.id }
+    });
     if (property) {
       res.json(property);
     } else {
@@ -54,7 +58,7 @@ export const createProperty = async (req, res) => {
       parsedAmenities = Array.isArray(req.body.amenities) ? req.body.amenities : req.body.amenities.split(',').map(a => a.trim()).filter(a => a);
     }
 
-    const property = new Property({
+    const propertyData = {
       title,
       description,
       price: Number(price),
@@ -62,13 +66,16 @@ export const createProperty = async (req, res) => {
       propertyType,
       investmentType,
       images: parsedImages,
-      highlights,
+      highlights: highlights || [],
       amenities: parsedAmenities,
       mapLocation,
       isFeatured: isFeatured === 'true' || isFeatured === true,
-    });
+    };
 
-    const createdProperty = await property.save();
+    const createdProperty = await prisma.property.create({
+      data: propertyData
+    });
+    
     res.status(201).json(createdProperty);
   } catch (error) {
     res.status(400).json({ message: 'Invalid property data', error: error.message });
@@ -82,7 +89,9 @@ export const updateProperty = async (req, res) => {
   try {
     const { title, description, price, location, propertyType, investmentType, highlights, mapLocation, isFeatured } = req.body;
 
-    const property = await Property.findById(req.params.id);
+    const property = await prisma.property.findUnique({
+      where: { id: req.params.id }
+    });
 
     if (property) {
       let parsedImages = property.images;
@@ -100,21 +109,23 @@ export const updateProperty = async (req, res) => {
         parsedAmenities = Array.isArray(req.body.amenities) ? req.body.amenities : req.body.amenities.split(',').map(a => a.trim()).filter(a => a);
       }
 
-      property.title = title || property.title;
-      property.description = description || property.description;
-      property.price = price ? Number(price) : property.price;
-      property.location = location || property.location;
-      property.propertyType = propertyType || property.propertyType;
-      property.investmentType = investmentType || property.investmentType;
-      property.images = parsedImages;
-      property.highlights = highlights || property.highlights;
-      property.amenities = parsedAmenities;
-      property.mapLocation = mapLocation || property.mapLocation;
-      if (isFeatured !== undefined) {
-         property.isFeatured = isFeatured === 'true' || isFeatured === true;
-      }
+      const updatedProperty = await prisma.property.update({
+        where: { id: req.params.id },
+        data: {
+          title: title || property.title,
+          description: description || property.description,
+          price: price ? Number(price) : property.price,
+          location: location || property.location,
+          propertyType: propertyType || property.propertyType,
+          investmentType: investmentType || property.investmentType,
+          images: parsedImages,
+          highlights: highlights || property.highlights,
+          amenities: parsedAmenities,
+          mapLocation: mapLocation || property.mapLocation,
+          isFeatured: isFeatured !== undefined ? (isFeatured === 'true' || isFeatured === true) : property.isFeatured,
+        }
+      });
 
-      const updatedProperty = await property.save();
       res.json(updatedProperty);
     } else {
       res.status(404).json({ message: 'Property not found' });
@@ -129,10 +140,14 @@ export const updateProperty = async (req, res) => {
 // @access  Private
 export const deleteProperty = async (req, res) => {
   try {
-    const property = await Property.findById(req.params.id);
+    const property = await prisma.property.findUnique({
+      where: { id: req.params.id }
+    });
 
     if (property) {
-      await property.deleteOne();
+      await prisma.property.delete({
+        where: { id: req.params.id }
+      });
       res.json({ message: 'Property removed' });
     } else {
       res.status(404).json({ message: 'Property not found' });

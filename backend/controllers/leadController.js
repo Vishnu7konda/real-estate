@@ -1,4 +1,4 @@
-import Lead from '../models/Lead.js';
+import prisma from '../prismaClient.js';
 
 // @desc    Create a new lead
 // @route   POST /api/leads
@@ -7,17 +7,18 @@ export const createLead = async (req, res) => {
   try {
     const { name, phone, email, budget, propertyType, sourcePage, message } = req.body;
 
-    const lead = new Lead({
-      name,
-      phone,
-      email,
-      budget,
-      propertyType,
-      sourcePage,
-      message,
+    const createdLead = await prisma.lead.create({
+      data: {
+        name,
+        phone,
+        email,
+        budget,
+        propertyType,
+        sourcePage,
+        message,
+      }
     });
 
-    const createdLead = await lead.save();
     res.status(201).json({ message: 'Lead submitted successfully', lead: createdLead });
   } catch (error) {
     res.status(400).json({ message: 'Invalid lead data', error: error.message });
@@ -29,7 +30,9 @@ export const createLead = async (req, res) => {
 // @access  Private (Agent)
 export const getLeads = async (req, res) => {
   try {
-    const leads = await Lead.find({}).sort({ createdAt: -1 });
+    const leads = await prisma.lead.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
     res.json(leads);
   } catch (error) {
     res.status(500).json({ message: 'Server Error', error: error.message });
@@ -43,13 +46,19 @@ export const updateLeadStatus = async (req, res) => {
   try {
     const { status, notes } = req.body;
 
-    const lead = await Lead.findById(req.params.id);
+    const lead = await prisma.lead.findUnique({
+      where: { id: req.params.id }
+    });
 
     if (lead) {
-      if (status) lead.status = status;
-      if (notes !== undefined) lead.notes = notes;
-
-      const updatedLead = await lead.save();
+      const updatedLead = await prisma.lead.update({
+        where: { id: req.params.id },
+        data: {
+          status: status || lead.status,
+          notes: notes !== undefined ? notes : lead.notes
+        }
+      });
+      
       res.json(updatedLead);
     } else {
       res.status(404).json({ message: 'Lead not found' });

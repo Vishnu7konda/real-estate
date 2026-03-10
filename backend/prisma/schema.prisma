@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Property {
+  id             String   @id @default(uuid())
+  title          String
+  description    String
+  price          Float
+  location       String
+  propertyType   String
+  investmentType String
+  images         String[] @default([])
+  highlights     String[] @default([])
+  amenities      String[] @default([])
+  mapLocation    String?
+  isFeatured     Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Lead {
+  id           String   @id @default(uuid())
+  name         String
+  phone        String
+  email        String?
+  propertyType String   @default("Any")
+  budget       String   @default("Not Specified")
+  sourcePage   String?
+  message      String?
+  status       String   @default("New")
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}

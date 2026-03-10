@@ -1,5 +1,4 @@
 import express from 'express';
-import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import propertyRoutes from './routes/propertyRoutes.js';
@@ -31,27 +30,7 @@ app.use('/api/leads', leadRoutes);
 // Serve Static Files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Database connection
-const connectDB = async () => {
-  try {
-    if (!process.env.MONGODB_URI) {
-      console.warn('⚠️ MONGODB_URI is not defined in the environment variables. Starting without DB connection.');
-      return;
-    }
-    const conn = await mongoose.connect(process.env.MONGODB_URI);
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
-  } catch (error) {
-    console.error(`Error connecting to MongoDB: ${error.message}`);
-    process.exit(1);
-  }
-};
-
 // Start server
-const startServer = async () => {
-  await connectDB();
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-  });
-};
-
-startServer();
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
