@@ -16,7 +16,15 @@ const AgentDashboard = () => {
     title: '', description: '', price: '', location: '', propertyType: 'Villa', investmentType: 'High ROI', images: '', amenities: '', mapLocation: '', isFeatured: false, imageFiles: []
   });
 
-  // Simple mock auth for MVP
+  const formatPrice = (value) => {
+    if (!value) return '';
+    const num = Number(value);
+    if (isNaN(num)) return '';
+    if (num >= 10000000) return `₹${+(num / 10000000).toFixed(2)} Cr`;
+    if (num >= 100000) return `₹${+(num / 100000).toFixed(2)} L`;
+    return `₹${num.toLocaleString('en-IN')}`;
+  };
+
   const handleLogin = (e) => {
     e.preventDefault();
     if (password === '123456789') { // Hardcoded for demo
@@ -317,7 +325,10 @@ const AgentDashboard = () => {
                   <form onSubmit={handleAddProperty} style={{ display: 'grid', gap: '1rem' }}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                       <input type="text" placeholder="Title" required className="input-field" value={newProp.title} onChange={e => setNewProp({...newProp, title: e.target.value})} />
-                      <input type="number" placeholder="Price (INR)" required className="input-field" value={newProp.price} onChange={e => setNewProp({...newProp, price: e.target.value})} />
+                      <div>
+                        <input type="number" placeholder="Price Contextual (INR)" required className="input-field" value={newProp.price} onChange={e => setNewProp({...newProp, price: e.target.value})} />
+                        {newProp.price && <div style={{ fontSize: '0.75rem', color: 'var(--secondary)', marginTop: '0.25rem', fontWeight: '600' }}>Formatted: {formatPrice(newProp.price)}</div>}
+                      </div>
                     </div>
                     <input type="text" placeholder="Location" required className="input-field" value={newProp.location} onChange={e => setNewProp({...newProp, location: e.target.value})} />
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
@@ -375,7 +386,7 @@ const AgentDashboard = () => {
                           <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{prop.location}</div>
                         </td>
                         <td style={{ padding: '1rem', fontSize: '0.875rem' }}>{prop.propertyType}</td>
-                        <td style={{ padding: '1rem', fontSize: '0.875rem', fontWeight: '600' }}>{new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(prop.price)}</td>
+                        <td style={{ padding: '1rem', fontSize: '0.875rem', fontWeight: '600' }}>{formatPrice(prop.price)}</td>
                         <td style={{ padding: '1rem' }}>
                           <button onClick={() => handleDeleteProperty(prop._id)} style={{ padding: '0.25rem 0.5rem', borderRadius: '0.25rem', border: 'none', backgroundColor: '#FEE2E2', color: '#991B1B', cursor: 'pointer', fontSize: '0.75rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                             <FiTrash2 /> Delete
