@@ -33,20 +33,39 @@ export const getPropertyById = async (req, res) => {
 // @access  Private
 export const createProperty = async (req, res) => {
   try {
-    const { title, description, price, location, propertyType, investmentType, images, highlights, amenities, mapLocation, isFeatured } = req.body;
+    const { title, description, price, location, propertyType, investmentType, highlights, mapLocation, isFeatured } = req.body;
+
+    let parsedImages = [];
+    if (req.body.imageUrls) {
+      if (Array.isArray(req.body.imageUrls)) {
+        parsedImages = req.body.imageUrls;
+      } else {
+        parsedImages = typeof req.body.imageUrls === 'string' ? req.body.imageUrls.split(',').map(i => i.trim()).filter(i => i) : [];
+      }
+    }
+    
+    if (req.files && req.files.length > 0) {
+      const fileUrls = req.files.map(file => `${req.protocol}://${req.get('host')}/uploads/${file.filename}`);
+      parsedImages = [...parsedImages, ...fileUrls];
+    }
+
+    let parsedAmenities = [];
+    if (req.body.amenities) {
+      parsedAmenities = Array.isArray(req.body.amenities) ? req.body.amenities : req.body.amenities.split(',').map(a => a.trim()).filter(a => a);
+    }
 
     const property = new Property({
       title,
       description,
-      price,
+      price: Number(price),
       location,
       propertyType,
       investmentType,
-      images,
+      images: parsedImages,
       highlights,
-      amenities,
+      amenities: parsedAmenities,
       mapLocation,
-      isFeatured,
+      isFeatured: isFeatured === 'true' || isFeatured === true,
     });
 
     const createdProperty = await property.save();
@@ -61,22 +80,39 @@ export const createProperty = async (req, res) => {
 // @access  Private
 export const updateProperty = async (req, res) => {
   try {
-    const { title, description, price, location, propertyType, investmentType, images, highlights, amenities, mapLocation, isFeatured } = req.body;
+    const { title, description, price, location, propertyType, investmentType, highlights, mapLocation, isFeatured } = req.body;
 
     const property = await Property.findById(req.params.id);
 
     if (property) {
+      let parsedImages = property.images;
+      if (req.body.imageUrls) {
+         const incomingImages = Array.isArray(req.body.imageUrls) ? req.body.imageUrls : req.body.imageUrls.split(',').map(i => i.trim()).filter(i => i);
+         parsedImages = [...parsedImages, ...incomingImages];
+      }
+      if (req.files && req.files.length > 0) {
+        const fileUrls = req.files.map(file => `${req.protocol}://${req.get('host')}/uploads/${file.filename}`);
+        parsedImages = [...parsedImages, ...fileUrls];
+      }
+
+      let parsedAmenities = property.amenities;
+      if (req.body.amenities) {
+        parsedAmenities = Array.isArray(req.body.amenities) ? req.body.amenities : req.body.amenities.split(',').map(a => a.trim()).filter(a => a);
+      }
+
       property.title = title || property.title;
       property.description = description || property.description;
-      property.price = price || property.price;
+      property.price = price ? Number(price) : property.price;
       property.location = location || property.location;
       property.propertyType = propertyType || property.propertyType;
       property.investmentType = investmentType || property.investmentType;
-      property.images = images || property.images;
+      property.images = parsedImages;
       property.highlights = highlights || property.highlights;
-      property.amenities = amenities || property.amenities;
+      property.amenities = parsedAmenities;
       property.mapLocation = mapLocation || property.mapLocation;
-      property.isFeatured = isFeatured !== undefined ? isFeatured : property.isFeatured;
+      if (isFeatured !== undefined) {
+         property.isFeatured = isFeatured === 'true' || isFeatured === true;
+      }
 
       const updatedProperty = await property.save();
       res.json(updatedProperty);

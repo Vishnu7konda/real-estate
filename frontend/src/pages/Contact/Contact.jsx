@@ -9,11 +9,18 @@ const Contact = () => {
     name: '',
     phone: '',
     email: '',
-    budget: '',
+    budget: '50000000',
     propertyType: 'Any',
     message: ''
   });
   const [status, setStatus] = useState('');
+
+  const formatBudget = (value) => {
+    const num = Number(value);
+    if (num >= 10000000) return `₹${+(num / 10000000).toFixed(2)} Cr`;
+    if (num >= 100000) return `₹${+(num / 100000).toFixed(2)} L`;
+    return `₹${num.toLocaleString('en-IN')}`;
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -38,7 +45,7 @@ const Contact = () => {
 
       if (response.ok) {
         setStatus('success');
-        setFormData({ name: '', phone: '', email: '', budget: '', propertyType: 'Any', message: '' });
+        setFormData({ name: '', phone: '', email: '', budget: '50000000', propertyType: 'Any', message: '' });
       } else {
         setStatus('error');
       }
@@ -172,16 +179,24 @@ const Contact = () => {
                           <option value="Commercial">Commercial Spaces</option>
                         </select>
                       </div>
-                      <div>
-                        <label className="input-label" htmlFor="budget">Estimated Budget *</label>
-                        <select id="budget" name="budget" className="input-field" value={formData.budget} onChange={handleChange} required>
-                          <option value="" disabled>Select Budget</option>
-                          <option value="Under ₹5Cr">Under ₹5Cr</option>
-                          <option value="₹5Cr - ₹10Cr">₹5Cr - ₹10Cr</option>
-                          <option value="₹10Cr - ₹20Cr">₹10Cr - ₹20Cr</option>
-                          <option value="₹20Cr - ₹50Cr">₹20Cr - ₹50Cr</option>
-                          <option value="Above ₹50Cr">Above ₹50Cr</option>
-                        </select>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                        <label className="input-label" htmlFor="budget" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          Max Budget * 
+                          <span style={{ color: 'var(--primary)', fontWeight: '600' }}>{formatBudget(formData.budget)}</span>
+                        </label>
+                        <input 
+                          type="range" 
+                          id="budget" 
+                          name="budget" 
+                          className="input-field" 
+                          style={{ padding: '0', cursor: 'ew-resize', accentColor: 'var(--secondary)', border: 'none' }}
+                          min="1000000" 
+                          max="50000000" 
+                          step="1000000"
+                          value={formData.budget} 
+                          onChange={handleChange} 
+                          required 
+                        />
                       </div>
                     </div>
 

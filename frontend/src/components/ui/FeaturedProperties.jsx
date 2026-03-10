@@ -12,8 +12,8 @@ const FeaturedProperties = () => {
     const fetchFeaturedProperties = async () => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/properties`);
-        // Filter featured properties locally (or could add a query param to backend)
-        const featured = response.data.filter(p => p.isFeatured).slice(0, 3);
+        // Filter featured properties locally and reverse to show newest first
+        const featured = response.data.filter(p => p.isFeatured).reverse().slice(0, 3);
         setProperties(featured);
       } catch (error) {
         console.error('Error fetching featured properties:', error);

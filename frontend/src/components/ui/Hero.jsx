@@ -8,8 +8,15 @@ const Hero = () => {
   const [searchParams, setSearchParams] = useState({
     location: '',
     propertyType: '',
-    budget: '',
+    budget: '50000000', // Default Max 5 Cr
   });
+
+  const formatBudget = (value) => {
+    const num = Number(value);
+    if (num >= 10000000) return `₹${+(num / 10000000).toFixed(2)} Cr`;
+    if (num >= 100000) return `₹${+(num / 100000).toFixed(2)} L`;
+    return `₹${num.toLocaleString('en-IN')}`;
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -70,19 +77,20 @@ const Hero = () => {
               </select>
             </div>
 
-            <div className="search-input-group border-left">
-              <select 
+            <div className="search-input-group border-left" style={{ display: 'flex', flexDirection: 'column', padding: '0 1rem', justifyContent: 'center', width: '200px' }}>
+              <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.25rem', fontWeight: '500' }}>
+                Max Budget: <span style={{ color: 'var(--primary)' }}>{formatBudget(searchParams.budget)}</span>
+              </label>
+              <input 
+                type="range" 
                 name="budget" 
+                min="1000000" 
+                max="50000000" 
+                step="1000000"
                 value={searchParams.budget}
                 onChange={handleChange}
-                className="search-input"
-              >
-                <option value="">Budget</option>
-                <option value="Under ₹5Cr">Under ₹5Cr</option>
-                <option value="₹5Cr - ₹10Cr">₹5Cr - ₹10Cr</option>
-                <option value="₹10Cr - ₹20Cr">₹10Cr - ₹20Cr</option>
-                <option value="Above ₹20Cr">Above ₹20Cr</option>
-              </select>
+                style={{ width: '100%', cursor: 'ew-resize', accentColor: 'var(--secondary)' }}
+              />
             </div>
 
             <button type="submit" className="search-submit-btn">

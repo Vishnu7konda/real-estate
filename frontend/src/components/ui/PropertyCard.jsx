@@ -23,7 +23,7 @@ const PropertyCard = ({ property }) => {
   return (
     <div className="property-card hover-lift">
       <div className="property-image-container">
-        <img src={property.images[0]} alt={property.title} className="property-image" />
+        <img src={property.images && property.images.length > 0 ? property.images[0] : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'} alt={property.title} className="property-image" />
         <div className="property-badges">
           <span className="badge badge-primary">{property.propertyType}</span>
           <span className="badge badge-dark">Featured</span>

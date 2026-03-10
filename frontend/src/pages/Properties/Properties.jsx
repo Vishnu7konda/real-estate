@@ -15,9 +15,16 @@ const Properties = () => {
   const [filters, setFilters] = useState({
     location: searchParams.get('location') || '',
     propertyType: searchParams.get('propertyType') || '',
-    budget: searchParams.get('budget') || '',
+    budget: searchParams.get('budget') || '50000000',
     sort: 'newest'
   });
+
+  const formatBudget = (value) => {
+    const num = Number(value);
+    if (num >= 10000000) return `₹${+(num / 10000000).toFixed(2)} Cr`;
+    if (num >= 100000) return `₹${+(num / 100000).toFixed(2)} L`;
+    return `₹${num.toLocaleString('en-IN')}`;
+  };
 
   const [showFilters, setShowFilters] = useState(false);
 
@@ -36,14 +43,7 @@ const Properties = () => {
           filtered = filtered.filter(p => p.location.toLowerCase().includes(filters.location.toLowerCase()));
         }
         if (filters.budget) {
-          // Simple mock budget logic based on select options
-          filtered = filtered.filter(p => {
-            if (filters.budget === 'Under ₹5Cr') return p.price < 50000000;
-            if (filters.budget === '₹5Cr - ₹10Cr') return p.price >= 50000000 && p.price <= 100000000;
-            if (filters.budget === '₹10Cr - ₹20Cr') return p.price > 100000000 && p.price <= 200000000;
-            if (filters.budget === 'Above ₹20Cr') return p.price > 200000000;
-            return true;
-          });
+          filtered = filtered.filter(p => p.price <= Number(filters.budget));
         }
         
         // Sorting
@@ -128,19 +128,21 @@ const Properties = () => {
             </div>
             
             <div className="filter-group">
-              <label className="input-label">Budget</label>
-              <select 
+              <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                Max Budget 
+                <span style={{ color: 'var(--primary)', fontWeight: '600' }}>{formatBudget(filters.budget)}</span>
+              </label>
+              <input 
+                type="range" 
                 name="budget" 
+                min="1000000" 
+                max="50000000" 
+                step="1000000"
                 className="input-field"
+                style={{ padding: '0', cursor: 'ew-resize', accentColor: 'var(--secondary)', border: 'none' }}
                 value={filters.budget}
                 onChange={handleFilterChange}
-              >
-                <option value="">Any Budget</option>
-                <option value="Under ₹5Cr">Under ₹5Cr</option>
-                <option value="₹5Cr - ₹10Cr">₹5Cr - ₹10Cr</option>
-                <option value="₹10Cr - ₹20Cr">₹10Cr - ₹20Cr</option>
-                <option value="Above ₹20Cr">Above ₹20Cr</option>
-              </select>
+              />
             </div>
 
             <button className="btn btn-primary" style={{ width: '100%' }}>

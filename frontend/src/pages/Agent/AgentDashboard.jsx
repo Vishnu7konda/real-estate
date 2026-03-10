@@ -13,18 +13,18 @@ const AgentDashboard = () => {
   const [propLoading, setPropLoading] = useState(false);
   const [showAddProp, setShowAddProp] = useState(false);
   const [newProp, setNewProp] = useState({
-    title: '', description: '', price: '', location: '', propertyType: 'Villa', investmentType: 'High ROI', images: '', amenities: '', mapLocation: '', isFeatured: false
+    title: '', description: '', price: '', location: '', propertyType: 'Villa', investmentType: 'High ROI', images: '', amenities: '', mapLocation: '', isFeatured: false, imageFiles: []
   });
 
   // Simple mock auth for MVP
   const handleLogin = (e) => {
     e.preventDefault();
-    if (password === 'admin123') { // Hardcoded for demo
+    if (password === '123456789') { // Hardcoded for demo
       setIsAuthenticated(true);
       fetchLeads();
       fetchProperties();
     } else {
-      alert('Invalid password. For demo, use: admin123');
+      alert('Invalid password. For demo, use: 123456789');
     }
   };
 
@@ -78,22 +78,34 @@ const AgentDashboard = () => {
   const handleAddProperty = async (e) => {
     e.preventDefault();
     try {
-      const propData = {
-        ...newProp,
-        price: Number(newProp.price),
-        images: newProp.images.split(',').map(i => i.trim()),
-        amenities: newProp.amenities.split(',').map(a => a.trim()),
-      };
+      const formData = new FormData();
+      formData.append('title', newProp.title);
+      formData.append('description', newProp.description);
+      formData.append('price', Number(newProp.price));
+      formData.append('location', newProp.location);
+      formData.append('propertyType', newProp.propertyType);
+      formData.append('investmentType', newProp.investmentType);
+      formData.append('isFeatured', newProp.isFeatured);
+      
+      if (newProp.amenities) formData.append('amenities', newProp.amenities);
+      if (newProp.images) formData.append('imageUrls', newProp.images);
+      
+      if (newProp.imageFiles && newProp.imageFiles.length > 0) {
+        for (let i = 0; i < newProp.imageFiles.length; i++) {
+          formData.append('images', newProp.imageFiles[i]);
+        }
+      }
+
       const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/properties`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(propData)
+        body: formData
       });
+      
       if (response.ok) {
         const added = await response.json();
         setProperties([...properties, added]);
         setShowAddProp(false);
-        setNewProp({ title: '', description: '', price: '', location: '', propertyType: 'Villa', investmentType: 'High ROI', images: '', amenities: '', mapLocation: '', isFeatured: false });
+        setNewProp({ title: '', description: '', price: '', location: '', propertyType: 'Villa', investmentType: 'High ROI', images: '', amenities: '', mapLocation: '', isFeatured: false, imageFiles: [] });
       } else {
         alert('Error adding property. Check console.');
       }
@@ -138,7 +150,7 @@ const AgentDashboard = () => {
               <input 
                 type="password" 
                 className="input-field" 
-                placeholder="Enter admin password (demo: admin123)" 
+                placeholder="Enter admin password (demo: 123456789)" 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -325,7 +337,18 @@ const AgentDashboard = () => {
                       </label>
                     </div>
                     <textarea placeholder="Description" required className="input-field" rows="3" value={newProp.description} onChange={e => setNewProp({...newProp, description: e.target.value})}></textarea>
-                    <input type="text" placeholder="Image URLs (comma separated)" required className="input-field" value={newProp.images} onChange={e => setNewProp({...newProp, images: e.target.value})} />
+                    
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', alignItems: 'center' }}>
+                      <div>
+                        <label style={{display: 'block', fontSize: '0.875rem', marginBottom: '0.25rem', color: 'var(--text-secondary)'}}>Upload Property Images</label>
+                        <input type="file" multiple accept="image/*" onChange={(e) => setNewProp({...newProp, imageFiles: e.target.files})} className="input-field" />
+                      </div>
+                      <div>
+                        <label style={{display: 'block', fontSize: '0.875rem', marginBottom: '0.25rem', color: 'var(--text-secondary)'}}>Or Provide External Image URLs</label>
+                        <input type="text" placeholder="Image URLs (comma separated)" className="input-field" value={newProp.images} onChange={e => setNewProp({...newProp, images: e.target.value})} />
+                      </div>
+                    </div>
+                    
                     <input type="text" placeholder="Amenities (comma separated)" className="input-field" value={newProp.amenities} onChange={e => setNewProp({...newProp, amenities: e.target.value})} />
                     <button type="submit" className="btn btn-primary" style={{ width: 'fit-content' }}>Save Property</button>
                   </form>

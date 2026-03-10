@@ -4,6 +4,11 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import propertyRoutes from './routes/propertyRoutes.js';
 import leadRoutes from './routes/leadRoutes.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Load environment variables
 dotenv.config();
@@ -22,6 +27,9 @@ app.get('/api/health', (req, res) => {
 
 app.use('/api/properties', propertyRoutes);
 app.use('/api/leads', leadRoutes);
+
+// Serve Static Files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Database connection
 const connectDB = async () => {
