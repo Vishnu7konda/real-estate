@@ -82,10 +82,15 @@ const Hero = () => {
               />
             </div>
 
-            <div className="search-input-group border-left" style={{ display: 'flex', flexDirection: 'column', padding: '0 1rem', justifyContent: 'center', width: '200px' }}>
-              <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.25rem', fontWeight: '500' }}>
-                {t('hero.maxBudgetLabel')}<span style={{ color: 'var(--primary)' }}>{formatBudget(searchParams.budget)}</span>
-              </label>
+            <div className="search-input-group border-left" style={{ display: 'flex', flexDirection: 'column', padding: '1rem', justifyContent: 'center', flex: 1 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', marginBottom: '0.5rem' }}>
+                <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: '500' }}>
+                  {t('hero.maxBudgetLabel')}
+                </label>
+                <span style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: '600' }}>
+                  {formatBudget(searchParams.budget)}
+                </span>
+              </div>
               <input 
                 type="range" 
                 name="budget" 
@@ -94,7 +99,7 @@ const Hero = () => {
                 step="1000000"
                 value={searchParams.budget}
                 onChange={handleChange}
-                style={{ width: '100%', cursor: 'ew-resize', accentColor: 'var(--secondary)' }}
+                style={{ width: '100%', cursor: 'ew-resize', accentColor: 'var(--secondary)', display: 'block', margin: '0.5rem 0 0.25rem' }}
               />
             </div>
 
