@@ -44,7 +44,7 @@ const PropertyDetails = () => {
     "@type": "RealEstateListing",
     "name": property.title,
     "description": property.description,
-    "image": property.images[0],
+    "image": (property.images && property.images.length > 0) ? property.images[0] : 'https://placehold.co/600x400',
     "offers": {
       "@type": "Offer",
       "price": property.price,
@@ -57,7 +57,7 @@ const PropertyDetails = () => {
       <SEO 
         title={property.title} 
         description={property.description.substring(0, 150)} 
-        image={property.images[0]}
+        image={(property.images && property.images.length > 0) ? property.images[0] : 'https://placehold.co/600x400'}
         schema={schema}
       />
 
@@ -90,10 +90,10 @@ const PropertyDetails = () => {
           {/* Image Gallery */}
           <div className="gallery-section">
             <div className="main-image">
-              <img src={property.images[activeImage]} alt={`${property.title} - Main`} />
+              <img src={(property.images && property.images.length > 0) ? property.images[activeImage] : 'https://placehold.co/800x500/eaeaea/a3a3a3?text=No+Image+Available'} alt={`${property.title} - Main`} />
             </div>
             <div className="thumbnail-list">
-              {property.images.map((img, index) => (
+              {property.images && property.images.length > 0 && property.images.map((img, index) => (
                 <div 
                   key={index} 
                   className={`thumbnail ${activeImage === index ? 'active' : ''}`}
@@ -120,18 +120,24 @@ const PropertyDetails = () => {
               <div className="details-card">
                 <h2>{t('propertyDetails.highlightsTitle')}</h2>
                 <ul className="highlights-list">
-                  {property.highlights.map((highlight, index) => (
+                  {property.highlights && property.highlights.map((highlight, index) => (
                     <li key={index}><FiCheckCircle className="check-icon" /> {highlight}</li>
                   ))}
+                  {(!property.highlights || property.highlights.length === 0) && (
+                    <li><FiCheckCircle className="check-icon" /> Premium Finish</li>
+                  )}
                 </ul>
               </div>
 
               <div className="details-card">
                 <h2>{t('propertyDetails.amenitiesTitle')}</h2>
                 <div className="amenities-grid">
-                  {property.amenities.map((amenity, index) => (
+                  {property.amenities && property.amenities.map((amenity, index) => (
                     <div key={index} className="amenity-item">{amenity}</div>
                   ))}
+                  {(!property.amenities || property.amenities.length === 0) && (
+                    <div className="amenity-item">Basic Amenities Available</div>
+                  )}
                 </div>
               </div>
 

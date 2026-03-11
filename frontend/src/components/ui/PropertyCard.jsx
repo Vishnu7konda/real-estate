@@ -36,7 +36,7 @@ const PropertyCard = ({ property }) => {
       
       <div className="property-content">
         <h3 className="property-title">
-          <Link to={`/properties/${property._id}`}>{property.title}</Link>
+          <Link to={`/properties/${property.id || property._id}`}>{property.title}</Link>
         </h3>
         
         <div className="property-location">
@@ -49,14 +49,14 @@ const PropertyCard = ({ property }) => {
         </p>
         
         <div className="property-amenities">
-          {property.amenities.slice(0, 3).map((amenity, index) => (
+          {property.amenities && property.amenities.slice(0, 3).map((amenity, index) => (
             <span key={index} className="amenity-tag">{amenity}</span>
           ))}
-          {property.amenities.length > 3 && <span className="amenity-tag">+{property.amenities.length - 3}</span>}
+          {property.amenities && property.amenities.length > 3 && <span className="amenity-tag">+{property.amenities.length - 3}</span>}
         </div>
         
         <div className="property-card-actions">
-          <Link to={`/properties/${property._id}`} className="btn-detail">
+          <Link to={`/properties/${property.id || property._id}`} className="btn-detail">
             {t('propertyCard.viewDetailsBtn')} <FiMaximize2 />
           </Link>
           <button className="btn-whatsapp-sm" onClick={handleWhatsApp} aria-label="Inquire via WhatsApp">

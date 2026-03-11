@@ -7,7 +7,7 @@ import '../Properties/Properties.css';
 
 const AgentDashboard = () => {
   const { t, i18n } = useTranslation();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => sessionStorage.getItem('adminAuth') === 'true');
   const [password, setPassword] = useState('');
   const [activeTab, setActiveTab] = useState('leads');
   const [leads, setLeads] = useState([]);
@@ -22,6 +22,17 @@ const AgentDashboard = () => {
     title: '', description: '', price: '', location: '', propertyType: 'Villa', investmentType: 'High ROI', images: '', amenities: '', mapLocation: '', isFeatured: false, imageFiles: []
   });
   const [propToDelete, setPropToDelete] = useState(null);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      sessionStorage.setItem('adminAuth', 'true');
+      fetchLeads();
+      fetchProperties();
+    } else {
+      sessionStorage.removeItem('adminAuth');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated]);
 
   const leadStatusOptions = [
     { value: 'New', label: 'New' },
@@ -61,8 +72,6 @@ const AgentDashboard = () => {
     if (password === 'vishnu@konda') { // Hardcoded for demo
       setTimeout(() => {
         setIsAuthenticated(true);
-        fetchLeads();
-        fetchProperties();
         setIsLoading(false); // End loading
       }, 1000); // Simulate network delay
     } else {
