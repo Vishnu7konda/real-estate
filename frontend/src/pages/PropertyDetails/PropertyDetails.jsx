@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { FiMapPin, FiCheckCircle, FiShare2, FiHeart } from 'react-icons/fi';
+import { FiMapPin, FiCheckCircle, FiShare2, FiHeart, FiCheck } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import axios from 'axios';
 import SEO from '../../components/seo/SEO';
@@ -13,6 +13,12 @@ const PropertyDetails = () => {
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
+  const [inquiryName, setInquiryName] = useState('');
+  const [inquiryPhone, setInquiryPhone] = useState('');
+  const [inquiryMessage, setInquiryMessage] = useState('');
+  const [inquirySubmitting, setInquirySubmitting] = useState(false);
+  const [inquirySubmitted, setInquirySubmitted] = useState(false);
+  const [inquiryError, setInquiryError] = useState('');
 
   useEffect(() => {
     const fetchProperty = async () => {
@@ -27,6 +33,30 @@ const PropertyDetails = () => {
     };
     fetchProperty();
   }, [id]);
+
+  const handleInquiry = async (e) => {
+    e.preventDefault();
+    setInquirySubmitting(true);
+    setInquiryError('');
+    try {
+      await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/leads`, {
+        name: inquiryName,
+        phone: inquiryPhone,
+        message: inquiryMessage || `Interested in: ${property?.title}`,
+        propertyType: property?.propertyType || 'Any',
+        budget: 'Not Specified',
+        sourcePage: 'Property Details',
+      });
+      setInquirySubmitted(true);
+      setInquiryName('');
+      setInquiryPhone('');
+      setInquiryMessage('');
+    } catch (err) {
+      setInquiryError('Failed to send request. Please try WhatsApp or call us directly.');
+    } finally {
+      setInquirySubmitting(false);
+    }
+  };
 
   if (loading) return <div className="loading-spinner" style={{ minHeight: '60vh' }}>{t('propertyDetails.loading')}</div>;
   if (!property) return <div className="container" style={{ padding: '4rem 0', textAlign: 'center' }}>{t('propertyDetails.notFound')}</div>;
@@ -165,20 +195,36 @@ const PropertyDetails = () => {
                 <h3>{t('propertyDetails.contactTitle')}</h3>
                 <p>{t('propertyDetails.contactSubtitle')}</p>
                 
-                <form className="inquiry-form" onSubmit={(e) => e.preventDefault()}>
-                  <div className="input-group">
-                    <input type="text" className="input-field" placeholder={t('propertyDetails.namePlaceholder')} required />
-                  </div>
-                  <div className="input-group">
-                    <input type="tel" className="input-field" placeholder={t('propertyDetails.phonePlaceholder')} required />
-                  </div>
-                  <div className="input-group">
-                    <textarea className="input-field" placeholder={t('propertyDetails.messagePlaceholder')} rows="3"></textarea>
-                  </div>
-                  <button type="submit" className="btn btn-primary" style={{ width: '100%', marginBottom: '1rem' }}>
-                    {t('propertyDetails.requestDetailsBtn')}
-                  </button>
-                </form>
+                  {inquirySubmitted ? (
+                    <div style={{ textAlign: 'center', padding: '2rem 0' }}>
+                      <div style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: '#D1FAE5', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
+                        <FiCheck size={28} color="#059669" />
+                      </div>
+                      <h4 style={{ color: 'var(--primary)', marginBottom: '0.5rem' }}>Request Sent!</h4>
+                      <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>We'll contact you within 24 hours about this property.</p>
+                      <button onClick={() => setInquirySubmitted(false)} className="btn btn-outline" style={{ marginTop: '1rem', width: '100%' }}>Send Another Request</button>
+                    </div>
+                  ) : (
+                    <form className="inquiry-form" onSubmit={handleInquiry}>
+                      {inquiryError && (
+                        <div style={{ backgroundColor: '#FEE2E2', color: '#991B1B', padding: '0.75rem', borderRadius: '0.375rem', marginBottom: '1rem', fontSize: '0.875rem' }}>
+                          {inquiryError}
+                        </div>
+                      )}
+                      <div className="input-group">
+                        <input type="text" className="input-field" placeholder={t('propertyDetails.namePlaceholder')} required value={inquiryName} onChange={e => setInquiryName(e.target.value)} disabled={inquirySubmitting} />
+                      </div>
+                      <div className="input-group">
+                        <input type="tel" className="input-field" placeholder={t('propertyDetails.phonePlaceholder')} required value={inquiryPhone} onChange={e => setInquiryPhone(e.target.value)} disabled={inquirySubmitting} />
+                      </div>
+                      <div className="input-group">
+                        <textarea className="input-field" placeholder={t('propertyDetails.messagePlaceholder')} rows="3" value={inquiryMessage} onChange={e => setInquiryMessage(e.target.value)} disabled={inquirySubmitting}></textarea>
+                      </div>
+                      <button type="submit" className="btn btn-primary" style={{ width: '100%', marginBottom: '1rem' }} disabled={inquirySubmitting}>
+                        {inquirySubmitting ? 'Sending...' : t('propertyDetails.requestDetailsBtn')}
+                      </button>
+                    </form>
+                  )}
 
                 <div className="separator"><span>{t('propertyDetails.orText')}</span></div>
 

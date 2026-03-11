@@ -21,7 +21,8 @@ export const ensureStorageBucket = async (bucketName) => {
     if (!bucketExists) {
       const { error: createError } = await supabase.storage.createBucket(bucketName, {
         public: true,
-        fileSizeLimit: 5242880, // 5MB
+        fileSizeLimit: 10485760, // 10MB
+        allowedMimeTypes: ['image/*']
       });
       if (createError) throw createError;
       console.log(`✅ Supabase Storage bucket '${bucketName}' created successfully.`);

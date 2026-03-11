@@ -23,6 +23,8 @@ const AgentDashboard = () => {
     title: '', description: '', price: '', location: '', propertyType: 'Villa', investmentType: 'High ROI', images: '', amenities: '', mapLocation: '', isFeatured: false, imageFiles: []
   });
   const [propToDelete, setPropToDelete] = useState(null);
+  const [leadToDelete, setLeadToDelete] = useState(null);
+  const [editProp, setEditProp] = useState(null);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -140,6 +142,69 @@ const AgentDashboard = () => {
 
   const cancelDeleteProperty = () => {
     setPropToDelete(null);
+  };
+
+  const requestDeleteLead = (id) => setLeadToDelete(id);
+
+  const confirmDeleteLead = async () => {
+    if (!leadToDelete) return;
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/leads/${leadToDelete}`, {
+        method: 'DELETE'
+      });
+      if (response.ok) {
+        setLeads(leads.filter(l => (l.id || l._id) !== leadToDelete));
+      } else {
+        const errText = await response.text();
+        alert('Error deleting lead: ' + errText);
+      }
+    } catch (error) {
+      alert('Network error deleting lead: ' + error.message);
+    }
+    setLeadToDelete(null);
+  };
+
+  const cancelDeleteLead = () => setLeadToDelete(null);
+
+  const handleEditProperty = async (e) => {
+    e.preventDefault();
+    if (!editProp) return;
+    try {
+      const formData = new FormData();
+      formData.append('title', editProp.title);
+      formData.append('description', editProp.description);
+      formData.append('price', Number(editProp.price));
+      formData.append('location', editProp.location);
+      formData.append('propertyType', editProp.propertyType);
+      formData.append('investmentType', editProp.investmentType);
+      formData.append('isFeatured', editProp.isFeatured);
+      if (editProp.amenities) formData.append('amenities', Array.isArray(editProp.amenities) ? editProp.amenities.join(', ') : editProp.amenities);
+      if (editProp.mapLocation) formData.append('mapLocation', editProp.mapLocation);
+
+      // Send remaining existing image URLs
+      const remainingImages = editProp.images || [];
+      remainingImages.forEach(url => formData.append('imageUrls', url));
+
+      // Upload new image files
+      if (editProp.newImageFiles && editProp.newImageFiles.length > 0) {
+        editProp.newImageFiles.forEach(file => formData.append('images', file));
+      }
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/properties/${editProp.id || editProp._id}`, {
+        method: 'PUT',
+        body: formData
+      });
+      if (response.ok) {
+        const updated = await response.json();
+        setProperties(properties.map(p => (p.id || p._id) === (editProp.id || editProp._id) ? updated : p));
+        setEditProp(null);
+      } else {
+        const errText = await response.text();
+        alert('Error updating property: ' + errText);
+      }
+    } catch (err) {
+      alert('Network error: ' + err.message);
+    }
   };
 
   const handleAddProperty = async (e) => {
@@ -305,7 +370,134 @@ const AgentDashboard = () => {
         </div>
       </div>
 
-      {/* Custom Delete Confirmation Modal */}
+      {/* Edit Property Modal */}
+      {editProp && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '1rem' }}>
+          <div style={{ backgroundColor: 'var(--surface)', borderRadius: '0.75rem', width: '100%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto', boxShadow: 'var(--shadow-lg)' }}>
+            <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ color: 'var(--primary)', margin: 0, fontSize: '1.25rem' }}><FiEdit2 style={{ marginRight: '0.5rem' }} />Edit Property</h3>
+              <button onClick={() => setEditProp(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center' }}><FiX size={22} /></button>
+            </div>
+            <form onSubmit={handleEditProperty} style={{ padding: '1.5rem', display: 'grid', gap: '1rem' }}>
+              <div className="prop-form-grid-2">
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.825rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Title</label>
+                  <input type="text" required className="input-field" value={editProp.title} onChange={e => setEditProp({...editProp, title: e.target.value})} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.825rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Price (INR)</label>
+                  <input type="number" required className="input-field" value={editProp.price} onChange={e => setEditProp({...editProp, price: e.target.value})} />
+                  {editProp.price && <div style={{ fontSize: '0.75rem', color: 'var(--secondary)', marginTop: '0.25rem', fontWeight: '600' }}>{formatPrice(editProp.price)}</div>}
+                </div>
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.825rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Location</label>
+                <input type="text" required className="input-field" value={editProp.location} onChange={e => setEditProp({...editProp, location: e.target.value})} />
+              </div>
+              <div className="prop-form-grid-3">
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.825rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Type</label>
+                  <Dropdown options={propertyTypeOptions} value={editProp.propertyType} onChange={val => setEditProp({...editProp, propertyType: val})} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.825rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Investment</label>
+                  <Dropdown options={investmentTypeOptions} value={editProp.investmentType} onChange={val => setEditProp({...editProp, investmentType: val})} />
+                </div>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                  <input type="checkbox" checked={editProp.isFeatured} onChange={e => setEditProp({...editProp, isFeatured: e.target.checked})} /> Featured
+                </label>
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.825rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Description</label>
+                <textarea required className="input-field" rows="3" value={editProp.description} onChange={e => setEditProp({...editProp, description: e.target.value})}></textarea>
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.825rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Amenities (comma separated)</label>
+                <input type="text" className="input-field" value={Array.isArray(editProp.amenities) ? editProp.amenities.join(', ') : editProp.amenities || ''} onChange={e => setEditProp({...editProp, amenities: e.target.value})} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.825rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Map Location (Google Maps embed URL)</label>
+                <input type="text" className="input-field" placeholder="https://maps.google.com/embed..." value={editProp.mapLocation || ''} onChange={e => setEditProp({...editProp, mapLocation: e.target.value})} />
+              </div>
+              <div style={{ marginTop: '0.5rem', borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
+                <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', fontSize: '0.875rem', marginBottom: '0.75rem', color: 'var(--primary)', fontWeight: '600' }}>
+                  <span>Images (Max 7)</span>
+                  <span style={{ fontSize: '0.75rem', color: ((editProp.images?.length || 0) + (editProp.newImageFiles?.length || 0)) >= 7 ? 'var(--error)' : 'var(--text-secondary)' }}>
+                    {(editProp.images?.length || 0) + (editProp.newImageFiles?.length || 0)} / 7
+                  </span>
+                </label>
+                <div className="image-upload-grid">
+                  {/* Existing images from DB */}
+                  {(editProp.images || []).map((imgUrl, idx) => (
+                    <div key={`existing-${idx}`} className="image-upload-slot" style={{ cursor: 'default' }}>
+                      <img src={imgUrl} alt={`Image ${idx + 1}`} />
+                      <button type="button" className="image-remove-btn" onClick={() => setEditProp({...editProp, images: editProp.images.filter((_, i) => i !== idx)})}>
+                        <FiX size={14} />
+                      </button>
+                    </div>
+                  ))}
+                  {/* New images being added */}
+                  {(editProp.newImageFiles || []).map((file, idx) => (
+                    <div key={`new-${idx}`} className="image-upload-slot" style={{ cursor: 'default' }}>
+                      <img src={URL.createObjectURL(file)} alt={`New ${idx + 1}`} />
+                      <button type="button" className="image-remove-btn" onClick={() => setEditProp({...editProp, newImageFiles: editProp.newImageFiles.filter((_, i) => i !== idx)})}>
+                        <FiX size={14} />
+                      </button>
+                    </div>
+                  ))}
+                  {/* Empty upload slots */}
+                  {((editProp.images?.length || 0) + (editProp.newImageFiles?.length || 0)) < 7 && (
+                    <div className="image-upload-slot" onClick={() => document.getElementById('edit-image-upload').click()}>
+                      <FiPlus size={24} color="var(--text-secondary)" />
+                      <div className="image-upload-placeholder">Add Image</div>
+                    </div>
+                  )}
+                </div>
+                <input
+                  id="edit-image-upload"
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    const files = Array.from(e.target.files);
+                    const currentCount = (editProp.images?.length || 0) + (editProp.newImageFiles?.length || 0);
+                    const remaining = 7 - currentCount;
+                    const allowed = files.slice(0, remaining);
+                    if (files.length > remaining) alert('Max 7 images total.');
+                    setEditProp({...editProp, newImageFiles: [...(editProp.newImageFiles || []), ...allowed]});
+                    e.target.value = '';
+                  }}
+                />
+              </div>
+              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', paddingTop: '0.5rem', borderTop: '1px solid var(--border-color)' }}>
+                <button type="button" onClick={() => setEditProp(null)} style={{ padding: '0.6rem 1.25rem', borderRadius: '0.375rem', border: '1px solid var(--border-color)', backgroundColor: 'transparent', color: 'var(--text-secondary)', cursor: 'pointer', fontWeight: '500' }}>Cancel</button>
+                <button type="submit" className="btn btn-primary" style={{ padding: '0.6rem 1.5rem' }}>Save Changes</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Lead Delete Confirmation Modal */}
+      {leadToDelete && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+          <div style={{ backgroundColor: 'var(--surface)', padding: '2rem', borderRadius: '0.75rem', width: '90%', maxWidth: '400px', boxShadow: 'var(--shadow-lg)' }}>
+            <h3 style={{ color: 'var(--primary)', marginBottom: '1rem', fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <FiTrash2 color="#EF4444" /> Delete Lead
+            </h3>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', lineHeight: '1.5' }}>
+              Are you sure you want to delete this lead? This cannot be undone.
+            </p>
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+              <button onClick={cancelDeleteLead} style={{ padding: '0.5rem 1rem', borderRadius: '0.375rem', border: '1px solid var(--border-color)', backgroundColor: 'transparent', color: 'var(--text-secondary)', cursor: 'pointer', fontWeight: '500' }}>Cancel</button>
+              <button onClick={confirmDeleteLead} style={{ padding: '0.5rem 1rem', borderRadius: '0.375rem', border: 'none', backgroundColor: '#EF4444', color: 'white', cursor: 'pointer', fontWeight: '500' }}>Yes, Delete</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Property Delete Confirmation Modal */}
       {propToDelete && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
           <div style={{ backgroundColor: 'var(--surface)', padding: '2rem', borderRadius: '0.75rem', width: '90%', maxWidth: '400px', boxShadow: 'var(--shadow-lg)' }}>
@@ -408,6 +600,7 @@ const AgentDashboard = () => {
                         <th>Budget</th>
                         <th>Date</th>
                         <th>Status</th>
+                        <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -432,11 +625,16 @@ const AgentDashboard = () => {
                               />
                             </div>
                           </td>
+                          <td data-label="Actions">
+                            <button onClick={() => requestDeleteLead(lead.id || lead._id)} style={{ padding: '0.35rem 0.75rem', borderRadius: '0.25rem', border: 'none', backgroundColor: '#FEE2E2', color: '#991B1B', cursor: 'pointer', fontSize: '0.75rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.25rem', width: 'fit-content' }}>
+                              <FiTrash2 /> Delete
+                            </button>
+                          </td>
                         </tr>
                       ))}
                       {leads.length === 0 && (
                         <tr>
-                          <td colSpan="6" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>No leads found.</td>
+                          <td colSpan="7" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>No leads found.</td>
                         </tr>
                       )}
                     </tbody>
@@ -558,9 +756,14 @@ const AgentDashboard = () => {
                           <td data-label="Type" style={{ fontSize: '0.875rem' }}>{prop.propertyType}</td>
                           <td data-label="Price" style={{ fontSize: '0.875rem', fontWeight: '600' }}>{formatPrice(prop.price)}</td>
                           <td data-label="Actions">
-                            <button onClick={() => requestDeleteProperty(prop.id || prop._id)} style={{ padding: '0.35rem 0.75rem', borderRadius: '0.25rem', border: 'none', backgroundColor: '#FEE2E2', color: '#991B1B', cursor: 'pointer', fontSize: '0.75rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.25rem', width: 'fit-content' }}>
-                              <FiTrash2 /> Delete
-                            </button>
+                            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                              <button onClick={() => setEditProp({...prop, amenities: Array.isArray(prop.amenities) ? prop.amenities.join(', ') : prop.amenities || '', newImageFiles: []})} style={{ padding: '0.35rem 0.75rem', borderRadius: '0.25rem', border: 'none', backgroundColor: '#EFF6FF', color: '#1D4ED8', cursor: 'pointer', fontSize: '0.75rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                                <FiEdit2 /> Edit
+                              </button>
+                              <button onClick={() => requestDeleteProperty(prop.id || prop._id)} style={{ padding: '0.35rem 0.75rem', borderRadius: '0.25rem', border: 'none', backgroundColor: '#FEE2E2', color: '#991B1B', cursor: 'pointer', fontSize: '0.75rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                                <FiTrash2 /> Delete
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))}

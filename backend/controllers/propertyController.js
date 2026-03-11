@@ -51,17 +51,17 @@ export const createProperty = async (req, res) => {
     
     if (req.files && req.files.length > 0) {
       const uploadPromises = req.files.map(async (file) => {
-        const fileName = `${Date.now()}-${file.originalname.replace(/\s+/g, '-')}`;
+        const fileName = `${Date.now()}-${Math.random().toString(36).substr(2,6)}-${file.originalname.replace(/[^a-zA-Z0-9.-]/g, '-')}`;
         const { data, error } = await supabase.storage
           .from('properties')
           .upload(fileName, file.buffer, {
             contentType: file.mimetype,
-            upsert: false
+            upsert: true
           });
 
         if (error) {
-           console.error('Supabase upload error:', error);
-           throw new Error('Failed to upload image to Supabase');
+           console.error('Supabase upload error details:', JSON.stringify(error));
+           throw new Error(`Failed to upload image to Supabase: ${error.message || JSON.stringify(error)}`);
         }
 
         const { data: publicUrlData } = supabase.storage
@@ -117,23 +117,28 @@ export const updateProperty = async (req, res) => {
 
     if (property) {
       let parsedImages = property.images;
-      if (req.body.imageUrls) {
-         const incomingImages = Array.isArray(req.body.imageUrls) ? req.body.imageUrls : req.body.imageUrls.split(',').map(i => i.trim()).filter(i => i);
-         parsedImages = [...parsedImages, ...incomingImages];
+      if (req.body.imageUrls !== undefined) {
+        // Frontend explicitly sent the desired image list — use it as replacement
+        const incomingImages = Array.isArray(req.body.imageUrls)
+          ? req.body.imageUrls
+          : typeof req.body.imageUrls === 'string'
+            ? req.body.imageUrls.split(',').map(i => i.trim()).filter(i => i)
+            : [];
+        parsedImages = incomingImages;
       }
       if (req.files && req.files.length > 0) {
         const uploadPromises = req.files.map(async (file) => {
-          const fileName = `${Date.now()}-${file.originalname.replace(/\s+/g, '-')}`;
+          const fileName = `${Date.now()}-${Math.random().toString(36).substr(2,6)}-${file.originalname.replace(/[^a-zA-Z0-9.-]/g, '-')}`;
           const { data, error } = await supabase.storage
             .from('properties')
             .upload(fileName, file.buffer, {
               contentType: file.mimetype,
-              upsert: false
+              upsert: true
             });
 
           if (error) {
-             console.error('Supabase upload error:', error);
-             throw new Error('Failed to upload image to Supabase');
+             console.error('Supabase upload error details:', JSON.stringify(error));
+             throw new Error(`Failed to upload image to Supabase: ${error.message || JSON.stringify(error)}`);
           }
 
           const { data: publicUrlData } = supabase.storage

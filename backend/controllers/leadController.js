@@ -67,3 +67,21 @@ export const updateLeadStatus = async (req, res) => {
     res.status(400).json({ message: 'Error updating lead', error: error.message });
   }
 };
+// @desc    Delete a lead
+// @route   DELETE /api/leads/:id
+// @access  Private (Agent)
+export const deleteLead = async (req, res) => {
+  try {
+    const lead = await prisma.lead.findUnique({
+      where: { id: req.params.id }
+    });
+    if (lead) {
+      await prisma.lead.delete({ where: { id: req.params.id } });
+      res.json({ message: 'Lead removed' });
+    } else {
+      res.status(404).json({ message: 'Lead not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error', error: error.message });
+  }
+};

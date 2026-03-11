@@ -1,5 +1,5 @@
 import express from 'express';
-import { createLead, getLeads, updateLeadStatus } from '../controllers/leadController.js';
+import { createLead, getLeads, updateLeadStatus, deleteLead } from '../controllers/leadController.js';
 
 const router = express.Router();
 
@@ -9,5 +9,8 @@ router.route('/')
 
 router.route('/:id/status')
   .put(updateLeadStatus);
+
+router.route('/:id')
+  .delete(deleteLead);
 
 export default router;
