@@ -608,8 +608,10 @@ const AgentDashboard = () => {
                         <tr key={lead.id || lead._id}>
                           <td data-label="Name" style={{ fontWeight: '500' }}>{lead.name}</td>
                           <td data-label="Contact">
-                            <div style={{ fontSize: '0.875rem', color: 'var(--primary)' }}>{lead.phone}</div>
-                            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{lead.email}</div>
+                            <div>
+                              <div style={{ fontSize: '0.875rem', color: 'var(--primary)' }}>{lead.phone}</div>
+                              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{lead.email}</div>
+                            </div>
                           </td>
                           <td data-label="Interest" style={{ fontSize: '0.875rem' }}>{lead.propertyType}</td>
                           <td data-label="Budget" style={{ fontSize: '0.875rem' }}>{lead.budget}</td>
@@ -750,8 +752,10 @@ const AgentDashboard = () => {
                       {properties.map(prop => (
                         <tr key={prop.id || prop._id}>
                           <td data-label="Property" style={{ fontWeight: '500' }}>
-                            <div>{prop.title}</div>
-                            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{prop.location}</div>
+                            <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.25rem' }}>
+                              <div style={{ whiteSpace: 'normal', wordBreak: 'break-word', textAlign: 'right', lineHeight: '1.2' }}>{prop.title}</div>
+                              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', whiteSpace: 'normal', wordBreak: 'break-word', textAlign: 'right' }}>{prop.location}</div>
+                            </div>
                           </td>
                           <td data-label="Type" style={{ fontSize: '0.875rem' }}>{prop.propertyType}</td>
                           <td data-label="Price" style={{ fontSize: '0.875rem', fontWeight: '600' }}>{formatPrice(prop.price)}</td>
