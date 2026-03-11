@@ -24,7 +24,7 @@ const PropertyCard = ({ property }) => {
   };
 
   return (
-    <div className="property-card hover-lift">
+    <Link to={`/properties/${property.id || property._id}`} className="property-card hover-lift" style={{ display: 'block', textDecoration: 'none', color: 'inherit' }}>
       <div className="property-image-container">
         <img src={property.images && property.images.length > 0 ? property.images[0] : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'} alt={property.title} className="property-image" />
         <div className="property-badges">
@@ -36,7 +36,7 @@ const PropertyCard = ({ property }) => {
       
       <div className="property-content">
         <h3 className="property-title">
-          <Link to={`/properties/${property.id || property._id}`}>{property.title}</Link>
+          {property.title}
         </h3>
         
         <div className="property-location">
@@ -56,15 +56,23 @@ const PropertyCard = ({ property }) => {
         </div>
         
         <div className="property-card-actions">
-          <Link to={`/properties/${property.id || property._id}`} className="btn-detail">
+          <span className="btn-detail" style={{ cursor: 'pointer' }}>
             {t('propertyCard.viewDetailsBtn')} <FiMaximize2 />
-          </Link>
-          <button className="btn-whatsapp-sm" onClick={handleWhatsApp} aria-label="Inquire via WhatsApp">
+          </span>
+          <button 
+            className="btn-whatsapp-sm" 
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation(); // Stop the click from bubbling up to the Link
+              handleWhatsApp(e);
+            }} 
+            aria-label="Inquire via WhatsApp"
+          >
             <FaWhatsapp />
           </button>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 
