@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import SEO from '../../components/seo/SEO';
 import PropertyCard from '../../components/ui/PropertyCard';
 import Dropdown from '../../components/ui/Dropdown';
@@ -8,6 +9,7 @@ import axios from 'axios';
 import './Properties.css';
 
 const Properties = () => {
+  const { t } = useTranslation();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   
@@ -21,17 +23,17 @@ const Properties = () => {
   });
 
   const propertyTypeOptions = [
-    { value: '', label: 'All Types' },
-    { value: 'Plot', label: 'Plot' },
-    { value: 'Villa', label: 'Villa' },
-    { value: 'Apartment', label: 'Apartment' },
-    { value: 'Commercial', label: 'Commercial' }
+    { value: '', label: t('propertiesPage.propertyTypePlaceholder') },
+    { value: 'Plot', label: t('hero.propertyTypePlot') },
+    { value: 'Villa', label: t('hero.propertyTypeVilla') },
+    { value: 'Apartment', label: t('hero.propertyTypeApartment') },
+    { value: 'Commercial', label: t('hero.propertyTypeCommercial') }
   ];
 
   const sortOptions = [
-    { value: 'newest', label: 'Newest First' },
-    { value: 'price-low', label: 'Price: Low to High' },
-    { value: 'price-high', label: 'Price: High to Low' }
+    { value: 'newest', label: t('propertiesPage.sortNewest') },
+    { value: 'price-low', label: t('propertiesPage.sortPriceLow') },
+    { value: 'price-high', label: t('propertiesPage.sortPriceHigh') }
   ];
 
   const formatBudget = (value) => {
@@ -88,16 +90,16 @@ const Properties = () => {
   return (
     <>
       <SEO 
-        title="Browse Premium Properties" 
-        description="Search our exclusive listings of luxury villas, apartments, and commercial spaces."
+        title={t('propertiesPage.seoTitle')} 
+        description={t('propertiesPage.seoDescription')}
       />
       
       <div className="properties-page bg-gray">
         {/* Page Header */}
         <div className="page-header">
           <div className="container">
-            <h1 className="page-title">Browse Properties</h1>
-            <p className="page-subtitle">Find the perfect property that matches your lifestyle and investment goals.</p>
+            <h1 className="page-title">{t('propertiesPage.pageTitle')}</h1>
+            <p className="page-subtitle">{t('propertiesPage.pageSubtitle')}</p>
           </div>
         </div>
 
@@ -105,7 +107,7 @@ const Properties = () => {
           {/* Sidebar Filters */}
           <aside className={`filters-sidebar ${showFilters ? 'show' : ''}`}>
             <div className="filters-header">
-              <h3>Search Filters</h3>
+              <h3>{t('propertiesPage.searchFilters')}</h3>
               <button 
                 className="close-filters desktop-hide"
                 onClick={() => setShowFilters(false)}
@@ -115,30 +117,30 @@ const Properties = () => {
             </div>
             
             <div className="filter-group">
-              <label className="input-label">Location</label>
+              <label className="input-label">{t('propertiesPage.locationLabel')}</label>
               <input 
                 type="text" 
                 name="location" 
                 className="input-field" 
-                placeholder="City, Neighborhood..." 
+                placeholder={t('propertiesPage.locationPlaceholder')} 
                 value={filters.location}
                 onChange={handleFilterChange}
               />
             </div>
             
             <div className="filter-group">
-              <label className="input-label">Property Type</label>
+              <label className="input-label">{t('propertiesPage.propertyTypeLabel')}</label>
               <Dropdown 
                 options={propertyTypeOptions}
                 value={filters.propertyType}
                 onChange={(val) => setFilters({ ...filters, propertyType: val })}
-                placeholder="All Types"
+                placeholder={t('propertiesPage.propertyTypePlaceholder')}
               />
             </div>
             
             <div className="filter-group">
               <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                Max Budget 
+                {t('propertiesPage.maxBudgetLabel')}
                 <span style={{ color: 'var(--primary)', fontWeight: '600' }}>{formatBudget(filters.budget)}</span>
               </label>
               <input 
@@ -155,21 +157,21 @@ const Properties = () => {
             </div>
 
             <button className="btn btn-primary" style={{ width: '100%' }}>
-              Apply Filters
+              {t('propertiesPage.applyFiltersBtn')}
             </button>
           </aside>
 
           {/* Main Content Area */}
           <main className="properties-main">
             <div className="properties-toolbar">
-              <p className="results-count">Showing <strong>{properties.length}</strong> luxurious properties</p>
+              <p className="results-count">{t('propertiesPage.showingResultsLeft')}<strong>{properties.length}</strong>{t('propertiesPage.showingResultsRight')}</p>
               
               <div className="toolbar-actions">
                 <button 
                   className="btn btn-outline filters-toggle desktop-hide"
                   onClick={() => setShowFilters(true)}
                 >
-                  <FiFilter /> Filters
+                  <FiFilter /> {t('propertiesPage.filtersBtnMobile')}
                 </button>
                 
                 <Dropdown 
@@ -182,7 +184,7 @@ const Properties = () => {
             </div>
 
             {loading ? (
-              <div className="loading-spinner">Loading properties...</div>
+              <div className="loading-spinner">{t('propertiesPage.loading')}</div>
             ) : properties.length > 0 ? (
               <div className="properties-grid main-grid">
                 {properties.map(property => (
@@ -191,14 +193,14 @@ const Properties = () => {
               </div>
             ) : (
               <div className="no-results">
-                <h3>No properties found</h3>
-                <p>Try adjusting your search filters to find what you're looking for.</p>
+                <h3>{t('propertiesPage.noResultsTitle')}</h3>
+                <p>{t('propertiesPage.noResultsText')}</p>
                 <button 
                   className="btn btn-outline" 
                   style={{ marginTop: '1rem' }}
                   onClick={() => setFilters({ location: '', propertyType: '', budget: '', sort: 'newest' })}
                 >
-                  Clear All Filters
+                  {t('propertiesPage.clearFiltersBtn')}
                 </button>
               </div>
             )}

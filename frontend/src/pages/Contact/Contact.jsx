@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { FiMapPin, FiPhone, FiMail } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 import Dropdown from '../../components/ui/Dropdown';
 import SEO from '../../components/seo/SEO';
 import '../Properties/Properties.css';
 
 const Contact = () => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -17,11 +19,11 @@ const Contact = () => {
   const [status, setStatus] = useState('');
 
   const propertyTypeOptions = [
-    { value: 'Any', label: 'Any Property Type' },
-    { value: 'Plot', label: 'Plots / Land' },
-    { value: 'Villa', label: 'Villas / Houses' },
-    { value: 'Apartment', label: 'Apartments' },
-    { value: 'Commercial', label: 'Commercial Spaces' }
+    { value: 'Any', label: t('hero.propertyTypeAny') },
+    { value: 'Plot', label: t('hero.propertyTypePlot') },
+    { value: 'Villa', label: t('hero.propertyTypeVilla') },
+    { value: 'Apartment', label: t('hero.propertyTypeApartment') },
+    { value: 'Commercial', label: t('hero.propertyTypeCommercial') }
   ];
 
   const formatBudget = (value) => {
@@ -67,16 +69,16 @@ const Contact = () => {
   return (
     <>
       <SEO 
-        title="Contact Us & Book Site Visit" 
-        description="Get in touch with Prime Estates to schedule a site visit or request a call back."
+        title={t('contactPage.seoTitle')} 
+        description={t('contactPage.seoDescription')}
       />
       
       <div className="bg-gray">
         {/* Page Header */}
         <div className="page-header">
           <div className="container">
-            <h1 className="page-title">Get In Touch</h1>
-            <p className="page-subtitle">We are here to help you find your dream property.</p>
+            <h1 className="page-title">{t('contactPage.pageTitle')}</h1>
+            <p className="page-subtitle">{t('contactPage.pageSubtitle')}</p>
           </div>
         </div>
 
@@ -86,9 +88,9 @@ const Contact = () => {
             
             {/* Contact Information Column */}
             <div>
-              <h2 style={{ fontSize: '2rem', marginBottom: '1.5rem', color: 'var(--primary)' }}>Contact Information</h2>
+              <h2 style={{ fontSize: '2rem', marginBottom: '1.5rem', color: 'var(--primary)' }}>{t('contactPage.contactInfoTitle')}</h2>
               <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', lineHeight: '1.6' }}>
-                Whether you have a question about a property, want to schedule a site visit, or need investment advice, our team is ready to answer all your questions.
+                {t('contactPage.contactInfoDesc')}
               </p>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', marginBottom: '3rem' }}>
@@ -97,8 +99,8 @@ const Contact = () => {
                     <FiMapPin />
                   </div>
                   <div>
-                    <h3 style={{ fontSize: '1.125rem', marginBottom: '0.25rem' }}>Office Address</h3>
-                    <p style={{ color: 'var(--text-secondary)' }}>123 Elite Realty Avenue<br />Business Park, CA 90210</p>
+                    <h3 style={{ fontSize: '1.125rem', marginBottom: '0.25rem' }}>{t('contactPage.officeAddressLabel')}</h3>
+                    <p style={{ color: 'var(--text-secondary)' }} dangerouslySetInnerHTML={{ __html: t('contactPage.officeAddressVal') }}></p>
                   </div>
                 </div>
 
@@ -107,10 +109,10 @@ const Contact = () => {
                     <FiPhone />
                   </div>
                   <div>
-                    <h3 style={{ fontSize: '1.125rem', marginBottom: '0.25rem' }}>Phone & WhatsApp</h3>
+                    <h3 style={{ fontSize: '1.125rem', marginBottom: '0.25rem' }}>{t('contactPage.phoneLabel')}</h3>
                     <p style={{ color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>+1 (555) 123-4567</p>
                     <a href="https://wa.me/1234567890" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: '#25D366', fontWeight: '500' }}>
-                      <FaWhatsapp /> Chat on WhatsApp
+                      <FaWhatsapp /> {t('contactPage.chatWhatsapp')}
                     </a>
                   </div>
                 </div>
@@ -120,7 +122,7 @@ const Contact = () => {
                     <FiMail />
                   </div>
                   <div>
-                    <h3 style={{ fontSize: '1.125rem', marginBottom: '0.25rem' }}>Email Us</h3>
+                    <h3 style={{ fontSize: '1.125rem', marginBottom: '0.25rem' }}>{t('contactPage.emailLabel')}</h3>
                     <p style={{ color: 'var(--text-secondary)' }}>info@primeestates.com</p>
                   </div>
                 </div>
@@ -143,19 +145,19 @@ const Contact = () => {
             {/* Contact Form Column */}
             <div>
               <div style={{ backgroundColor: 'var(--surface)', padding: '2.5rem', borderRadius: '1rem', boxShadow: 'var(--shadow-md)' }}>
-                <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', color: 'var(--primary)' }}>Send us a Message</h3>
-                <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>Fill out the form below and we will get back to you within 24 hours.</p>
+                <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', color: 'var(--primary)' }}>{t('contactPage.formTitle')}</h3>
+                <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>{t('contactPage.formSubtitle')}</p>
 
                 {status === 'success' ? (
                   <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', color: 'var(--success)', padding: '1.5rem', borderRadius: '0.5rem', textAlign: 'center', border: '1px solid var(--success)' }}>
-                    <h4 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>Message Sent Successfully!</h4>
-                    <p>Thank you for reaching out. One of our agents will contact you shortly.</p>
+                    <h4 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>{t('contactPage.successTitle')}</h4>
+                    <p>{t('contactPage.successDesc')}</p>
                     <button 
                       onClick={() => setStatus('')} 
                       className="btn btn-outline" 
                       style={{ marginTop: '1rem' }}
                     >
-                      Send Another Message
+                      {t('contactPage.sendAnotherBtn')}
                     </button>
                   </div>
                 ) : (
@@ -163,23 +165,23 @@ const Contact = () => {
                     
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
                       <div>
-                        <label className="input-label" htmlFor="name">Full Name *</label>
+                        <label className="input-label" htmlFor="name">{t('contactPage.nameLabelInput')}</label>
                         <input type="text" id="name" name="name" className="input-field" value={formData.name} onChange={handleChange} required />
                       </div>
                       <div>
-                        <label className="input-label" htmlFor="phone">Phone Number *</label>
+                        <label className="input-label" htmlFor="phone">{t('contactPage.phoneLabelInput')}</label>
                         <input type="tel" id="phone" name="phone" className="input-field" value={formData.phone} onChange={handleChange} required />
                       </div>
                     </div>
 
                     <div>
-                      <label className="input-label" htmlFor="email">Email Address</label>
+                      <label className="input-label" htmlFor="email">{t('contactPage.emailLabelInput')}</label>
                       <input type="email" id="email" name="email" className="input-field" value={formData.email} onChange={handleChange} />
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
                       <div>
-                        <label className="input-label" htmlFor="propertyType">Interested In</label>
+                        <label className="input-label" htmlFor="propertyType">{t('contactPage.interestedInLabel')}</label>
                         <Dropdown 
                           options={propertyTypeOptions}
                           value={formData.propertyType}
@@ -188,7 +190,7 @@ const Contact = () => {
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                         <label className="input-label" htmlFor="budget" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          Max Budget * 
+                          {t('contactPage.maxBudgetLabel')} 
                           <span style={{ color: 'var(--primary)', fontWeight: '600' }}>{formatBudget(formData.budget)}</span>
                         </label>
                         <input 
@@ -208,13 +210,13 @@ const Contact = () => {
                     </div>
 
                     <div>
-                      <label className="input-label" htmlFor="message">Message</label>
+                      <label className="input-label" htmlFor="message">{t('contactPage.messageLabel')}</label>
                       <textarea 
                         id="message" 
                         name="message" 
                         className="input-field" 
                         rows="4" 
-                        placeholder="I would like to schedule a site visit for..."
+                        placeholder={t('contactPage.messagePlaceholder')}
                         value={formData.message} 
                         onChange={handleChange}
                       ></textarea>
@@ -222,7 +224,7 @@ const Contact = () => {
 
                     {status === 'error' && (
                       <div style={{ color: 'var(--error)', fontSize: '0.875rem' }}>
-                        Failed to submit the form. Please check your connection or try again later.
+                        {t('contactPage.errorMsg')}
                       </div>
                     )}
 
@@ -232,7 +234,7 @@ const Contact = () => {
                       style={{ padding: '1rem' }}
                       disabled={status === 'submitting'}
                     >
-                      {status === 'submitting' ? 'Submitting...' : 'Send Message'}
+                      {status === 'submitting' ? t('contactPage.submittingBtn') : t('contactPage.submitBtn')}
                     </button>
                     
                   </form>

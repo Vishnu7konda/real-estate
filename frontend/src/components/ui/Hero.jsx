@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { FiSearch, FiMapPin } from 'react-icons/fi';
 import Dropdown from './Dropdown';
 import './Hero.css';
 
 const Hero = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useState({
     location: '',
@@ -13,11 +15,11 @@ const Hero = () => {
   });
 
   const propertyTypeOptions = [
-    { value: '', label: 'Property Type' },
-    { value: 'Plot', label: 'Plot' },
-    { value: 'Villa', label: 'Villa' },
-    { value: 'Apartment', label: 'Apartment' },
-    { value: 'Commercial', label: 'Commercial' }
+    { value: '', label: t('hero.propertyTypePlaceholder') },
+    { value: 'Plot', label: t('hero.propertyTypePlot') },
+    { value: 'Villa', label: t('hero.propertyTypeVilla') },
+    { value: 'Apartment', label: t('hero.propertyTypeApartment') },
+    { value: 'Commercial', label: t('hero.propertyTypeCommercial') }
   ];
 
   const formatBudget = (value) => {
@@ -42,18 +44,18 @@ const Hero = () => {
       <div className="hero-overlay"></div>
       <div className="container hero-content">
         <h1 className="hero-title">
-          Find Your Perfect <span>Property Investment</span>
+          {t('hero.titlePart1')}<span>{t('hero.titlePart2')}</span>
         </h1>
         <p className="hero-subtitle">
-          Trusted real estate guidance for plots, villas, and premium properties.
+          {t('hero.subtitle')}
         </p>
 
         <div className="hero-actions">
           <button className="btn btn-primary" onClick={() => navigate('/properties')}>
-            View Properties
+            {t('hero.viewPropertiesBtn')}
           </button>
           <button className="btn btn-outline light" onClick={() => navigate('/contact')}>
-            Book Site Visit
+            {t('hero.bookVisitBtn')}
           </button>
         </div>
 
@@ -64,7 +66,7 @@ const Hero = () => {
               <input
                 type="text"
                 name="location"
-                placeholder="Search Location..."
+                placeholder={t('hero.searchLocationPlaceholder')}
                 value={searchParams.location}
                 onChange={handleChange}
                 className="search-input"
@@ -76,13 +78,13 @@ const Hero = () => {
                 options={propertyTypeOptions}
                 value={searchParams.propertyType}
                 onChange={(val) => setSearchParams({ ...searchParams, propertyType: val })}
-                placeholder="Property Type"
+                placeholder={t('hero.propertyTypePlaceholder')}
               />
             </div>
 
             <div className="search-input-group border-left" style={{ display: 'flex', flexDirection: 'column', padding: '0 1rem', justifyContent: 'center', width: '200px' }}>
               <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.25rem', fontWeight: '500' }}>
-                Max Budget: <span style={{ color: 'var(--primary)' }}>{formatBudget(searchParams.budget)}</span>
+                {t('hero.maxBudgetLabel')}<span style={{ color: 'var(--primary)' }}>{formatBudget(searchParams.budget)}</span>
               </label>
               <input 
                 type="range" 
@@ -97,7 +99,7 @@ const Hero = () => {
             </div>
 
             <button type="submit" className="search-submit-btn">
-              <FiSearch /> Search
+              <FiSearch /> {t('hero.searchBtn')}
             </button>
           </form>
         </div>

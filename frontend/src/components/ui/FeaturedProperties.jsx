@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import PropertyCard from './PropertyCard';
 import { Link } from 'react-router-dom';
 import './FeaturedProperties.css';
 import axios from 'axios';
 
 const FeaturedProperties = () => {
+  const { t } = useTranslation();
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -30,16 +32,16 @@ const FeaturedProperties = () => {
       <div className="container">
         <div className="section-header">
           <div>
-            <h2 className="section-title">Featured Properties</h2>
-            <p className="section-subtitle">Discover our hand-picked selection of premium real estate.</p>
+            <h2 className="section-title">{t('featuredProperties.title')}</h2>
+            <p className="section-subtitle">{t('featuredProperties.subtitle')}</p>
           </div>
           <Link to="/properties" className="btn btn-outline desktop-only">
-            View All Properties
+            {t('featuredProperties.viewAllBtn')}
           </Link>
         </div>
 
         {loading ? (
-          <div className="loading-spinner">Loading properties...</div>
+          <div className="loading-spinner">{t('featuredProperties.loading')}</div>
         ) : (
           <div className="properties-grid">
             {properties.map(property => (
@@ -50,7 +52,7 @@ const FeaturedProperties = () => {
 
         <div className="mobile-only-btn-container">
           <Link to="/properties" className="btn btn-outline" style={{ width: '100%', marginTop: '2rem' }}>
-            View All Properties
+            {t('featuredProperties.viewAllBtn')}
           </Link>
         </div>
       </div>

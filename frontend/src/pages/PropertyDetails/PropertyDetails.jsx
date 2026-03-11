@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { FiMapPin, FiCheckCircle, FiShare2, FiHeart } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import axios from 'axios';
@@ -7,6 +8,7 @@ import SEO from '../../components/seo/SEO';
 import './PropertyDetails.css';
 
 const PropertyDetails = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -26,8 +28,8 @@ const PropertyDetails = () => {
     fetchProperty();
   }, [id]);
 
-  if (loading) return <div className="loading-spinner" style={{ minHeight: '60vh' }}>Loading property details...</div>;
-  if (!property) return <div className="container" style={{ padding: '4rem 0', textAlign: 'center' }}>Property not found</div>;
+  if (loading) return <div className="loading-spinner" style={{ minHeight: '60vh' }}>{t('propertyDetails.loading')}</div>;
+  if (!property) return <div className="container" style={{ padding: '4rem 0', textAlign: 'center' }}>{t('propertyDetails.notFound')}</div>;
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('en-IN', {
@@ -63,13 +65,13 @@ const PropertyDetails = () => {
         <div className="container">
           {/* Breadcrumbs */}
           <div className="breadcrumbs">
-            <Link to="/">Home</Link> &gt; <Link to="/properties">Properties</Link> &gt; <span>{property.title}</span>
+            <Link to="/">{t('propertyDetails.homeBreadcrumb')}</Link> &gt; <Link to="/properties">{t('propertyDetails.propertiesBreadcrumb')}</Link> &gt; <span>{property.title}</span>
           </div>
 
           <div className="details-header">
             <div>
               <div className="details-badges">
-                <span className="badge badge-primary">{property.propertyType}</span>
+                <span className="badge badge-primary">{t(`hero.propertyType${property.propertyType}`)}</span>
                 <span className="badge badge-dark">{property.investmentType}</span>
               </div>
               <h1 className="details-title">{property.title}</h1>
@@ -79,8 +81,8 @@ const PropertyDetails = () => {
             <div className="details-price-container">
               <div className="details-price">{formatPrice(property.price)}</div>
               <div className="details-actions">
-                <button className="btn-icon" aria-label="Save Property"><FiHeart /></button>
-                <button className="btn-icon" aria-label="Share Property"><FiShare2 /></button>
+                <button className="btn-icon" aria-label={t('propertyDetails.saveAria')}><FiHeart /></button>
+                <button className="btn-icon" aria-label={t('propertyDetails.shareAria')}><FiShare2 /></button>
               </div>
             </div>
           </div>
@@ -107,7 +109,7 @@ const PropertyDetails = () => {
             {/* Left Content Column */}
             <div className="details-main">
               <div className="details-card">
-                <h2>Overview</h2>
+                <h2>{t('propertyDetails.overviewTitle')}</h2>
                 <div className="description-text">
                   {property.description.split('\n').map((paragraph, index) => (
                     <p key={index}>{paragraph}</p>
@@ -116,7 +118,7 @@ const PropertyDetails = () => {
               </div>
 
               <div className="details-card">
-                <h2>Property Highlights</h2>
+                <h2>{t('propertyDetails.highlightsTitle')}</h2>
                 <ul className="highlights-list">
                   {property.highlights.map((highlight, index) => (
                     <li key={index}><FiCheckCircle className="check-icon" /> {highlight}</li>
@@ -125,7 +127,7 @@ const PropertyDetails = () => {
               </div>
 
               <div className="details-card">
-                <h2>Amenities</h2>
+                <h2>{t('propertyDetails.amenitiesTitle')}</h2>
                 <div className="amenities-grid">
                   {property.amenities.map((amenity, index) => (
                     <div key={index} className="amenity-item">{amenity}</div>
@@ -135,7 +137,7 @@ const PropertyDetails = () => {
 
               {property.mapLocation && (
                 <div className="details-card">
-                  <h2>Location</h2>
+                  <h2>{t('propertyDetails.locationTitle')}</h2>
                   <div className="map-container">
                     <iframe 
                       src={property.mapLocation} 
@@ -154,37 +156,37 @@ const PropertyDetails = () => {
             {/* Right Sidebar Column */}
             <div className="details-sidebar">
               <div className="contact-agent-card sticky">
-                <h3>Interested in this property?</h3>
-                <p>Contact our experts to schedule a site visit or request more information.</p>
+                <h3>{t('propertyDetails.contactTitle')}</h3>
+                <p>{t('propertyDetails.contactSubtitle')}</p>
                 
                 <form className="inquiry-form" onSubmit={(e) => e.preventDefault()}>
                   <div className="input-group">
-                    <input type="text" className="input-field" placeholder="Your Name" required />
+                    <input type="text" className="input-field" placeholder={t('propertyDetails.namePlaceholder')} required />
                   </div>
                   <div className="input-group">
-                    <input type="tel" className="input-field" placeholder="Phone Number" required />
+                    <input type="tel" className="input-field" placeholder={t('propertyDetails.phonePlaceholder')} required />
                   </div>
                   <div className="input-group">
-                    <textarea className="input-field" placeholder="I'm interested in this property..." rows="3"></textarea>
+                    <textarea className="input-field" placeholder={t('propertyDetails.messagePlaceholder')} rows="3"></textarea>
                   </div>
                   <button type="submit" className="btn btn-primary" style={{ width: '100%', marginBottom: '1rem' }}>
-                    Request Details
+                    {t('propertyDetails.requestDetailsBtn')}
                   </button>
                 </form>
 
-                <div className="separator"><span>OR</span></div>
+                <div className="separator"><span>{t('propertyDetails.orText')}</span></div>
 
                 <a 
-                  href={`https://wa.me/1234567890?text=${encodeURIComponent(`Hi, I want to know more about ${property.title} listed for ${formatPrice(property.price)}.`)}`}
+                  href={`https://wa.me/1234567890?text=${encodeURIComponent(`${t('propertyDetails.whatsappPrefix')}${property.title} listed for ${formatPrice(property.price)}.`)}`}
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="btn whatsapp-btn"
                 >
-                  <FaWhatsapp /> Chat on WhatsApp
+                  <FaWhatsapp /> {t('propertyDetails.chatWhatsappBtn')}
                 </a>
                 
                 <Link to="/contact" className="btn btn-outline" style={{ width: '100%' }}>
-                  Schedule Site Visit
+                  {t('propertyDetails.scheduleVisitBtn')}
                 </Link>
               </div>
             </div>

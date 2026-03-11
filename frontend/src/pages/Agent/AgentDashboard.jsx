@@ -1,21 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { FiUsers, FiHome, FiTrendingUp, FiLogOut, FiEdit2, FiTrash2 } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
+import { FiUsers, FiHome, FiTrendingUp, FiLogOut, FiEdit2, FiTrash2, FiEye, FiEyeOff, FiGlobe } from 'react-icons/fi';
 import Dropdown from '../../components/ui/Dropdown';
 import SEO from '../../components/seo/SEO';
 import '../Properties/Properties.css';
 
 const AgentDashboard = () => {
+  const { t, i18n } = useTranslation();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const [activeTab, setActiveTab] = useState('leads');
   const [leads, setLeads] = useState([]);
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   const [propLoading, setPropLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [showAddProp, setShowAddProp] = useState(false);
   const [newProp, setNewProp] = useState({
     title: '', description: '', price: '', location: '', propertyType: 'Villa', investmentType: 'High ROI', images: '', amenities: '', mapLocation: '', isFeatured: false, imageFiles: []
   });
+  const [propToDelete, setPropToDelete] = useState(null);
 
   const leadStatusOptions = [
     { value: 'New', label: 'New' },
@@ -50,12 +56,18 @@ const AgentDashboard = () => {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    if (password === '123456789') { // Hardcoded for demo
-      setIsAuthenticated(true);
-      fetchLeads();
-      fetchProperties();
+    setError(''); // Clear previous errors
+    setIsLoading(true); // Start loading
+    if (password === 'vishnu@konda') { // Hardcoded for demo
+      setTimeout(() => {
+        setIsAuthenticated(true);
+        fetchLeads();
+        fetchProperties();
+        setIsLoading(false); // End loading
+      }, 1000); // Simulate network delay
     } else {
-      alert('Invalid password. For demo, use: 123456789');
+      setIsLoading(false); // End loading
+      setError(t('adminLogin.invalidPassword'));
     }
   };
 
@@ -91,19 +103,33 @@ const AgentDashboard = () => {
     setPropLoading(false);
   };
 
-  const handleDeleteProperty = async (id) => {
-    if (window.confirm('Are you sure you want to delete this property?')) {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/properties/${id}`, {
-          method: 'DELETE'
-        });
-        if (response.ok) {
-          setProperties(properties.filter(p => p._id !== id));
-        }
-      } catch (error) {
-        console.error('Error deleting property:', error);
+  const requestDeleteProperty = (id) => {
+    setPropToDelete(id);
+  };
+
+  const confirmDeleteProperty = async () => {
+    if (!propToDelete) return;
+    const id = propToDelete;
+    
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/properties/${id}`, {
+        method: 'DELETE'
+      });
+      if (response.ok) {
+        setProperties(properties.filter(p => (p.id || p._id) !== id));
+      } else {
+        const errText = await response.text();
+        alert('Error deleting property: ' + errText);
       }
+    } catch (error) {
+      console.error('Error deleting property:', error);
+      alert('Network/Server error deleting property: ' + error.message);
     }
+    setPropToDelete(null);
+  };
+
+  const cancelDeleteProperty = () => {
+    setPropToDelete(null);
   };
 
   const handleAddProperty = async (e) => {
@@ -138,7 +164,9 @@ const AgentDashboard = () => {
         setShowAddProp(false);
         setNewProp({ title: '', description: '', price: '', location: '', propertyType: 'Villa', investmentType: 'High ROI', images: '', amenities: '', mapLocation: '', isFeatured: false, imageFiles: [] });
       } else {
-        alert('Error adding property. Check console.');
+        const errorText = await response.text();
+        alert('Error adding property: ' + errorText);
+        console.error('Server response:', errorText);
       }
     } catch (error) {
       console.error('Error adding property:', error);
@@ -155,7 +183,7 @@ const AgentDashboard = () => {
 
   const updateLeadStatus = async (id, newStatus) => {
     // Optimistic UI update
-    setLeads(leads.map(lead => lead._id === id ? { ...lead, status: newStatus } : lead));
+    setLeads(leads.map(lead => (lead.id || lead._id) === id ? { ...lead, status: newStatus } : lead));
     
     try {
       await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/leads/${id}/status`, {
@@ -171,23 +199,39 @@ const AgentDashboard = () => {
   if (!isAuthenticated) {
     return (
       <div className="section" style={{ minHeight: 'calc(100vh - 80px)', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--bg-color)' }}>
-        <SEO title="Agent Login" />
+        <SEO title={t('adminLogin.title')} />
         <div style={{ backgroundColor: 'var(--surface)', padding: '3rem', borderRadius: '1rem', width: '100%', maxWidth: '400px', boxShadow: 'var(--shadow-lg)', textAlign: 'center' }}>
-          <h1 style={{ color: 'var(--primary)', marginBottom: '1rem', fontSize: '2rem' }}>Agent Login</h1>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>Secure portal for Prime Estates agents.</p>
+          <h1 style={{ color: 'var(--primary)', marginBottom: '1rem', fontSize: '2rem' }}>{t('adminLogin.title')}</h1>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>{t('adminLogin.subtitle')}</p>
           
           <form onSubmit={handleLogin}>
-            <div className="input-group">
+            {error && (
+              <div style={{ backgroundColor: '#FEE2E2', color: '#991B1B', padding: '0.75rem', borderRadius: '0.375rem', marginBottom: '1rem', fontSize: '0.875rem' }}>
+                {error}
+              </div>
+            )}
+            <div className="input-group" style={{ position: 'relative' }}>
               <input 
-                type="password" 
+                type={showPassword ? "text" : "password"} 
                 className="input-field" 
-                placeholder="Enter admin password (demo: 123456789)" 
+                placeholder={t('adminLogin.passwordPlaceholder')} 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                disabled={isLoading}
+                style={{ borderColor: error ? '#EF4444' : 'var(--border-color)', paddingRight: '2.5rem' }}
               />
+              <button 
+                type="button" 
+                onClick={() => setShowPassword(!showPassword)}
+                style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >
+                {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+              </button>
             </div>
-            <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Login to Dashboard</button>
+            <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
+              {isLoading ? t('adminLogin.verifyingButton') : t('adminLogin.loginButton')}
+            </button>
           </form>
         </div>
       </div>
@@ -201,13 +245,57 @@ const AgentDashboard = () => {
       {/* Top Navbar for CRM */}
       <div style={{ backgroundColor: 'var(--primary)', color: 'var(--surface)', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2 style={{ fontSize: '1.25rem', margin: 0 }}>Prime Estates CRM</h2>
-        <button 
-          onClick={() => setIsAuthenticated(false)} 
-          style={{ background: 'none', border: 'none', color: 'var(--surface)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1rem' }}
-        >
-          <FiLogOut /> Logout
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', zIndex: 1000 }}>
+            <FiGlobe size={18} />
+            <div style={{ width: '130px', color: '#1E293B' }}>
+              <Dropdown 
+                options={[
+                  { value: 'en', label: 'English' },
+                  { value: 'te', label: 'తెలుగు' },
+                  { value: 'hi', label: 'हिन्दी' }
+                ]}
+                value={i18n.language || 'en'}
+                onChange={(val) => i18n.changeLanguage(val)}
+              />
+            </div>
+          </div>
+          <button 
+            onClick={() => setIsAuthenticated(false)} 
+            style={{ background: 'none', border: 'none', color: 'var(--surface)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1rem' }}
+          >
+            <FiLogOut /> Logout
+          </button>
+        </div>
       </div>
+
+      {/* Custom Delete Confirmation Modal */}
+      {propToDelete && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+          <div style={{ backgroundColor: 'var(--surface)', padding: '2rem', borderRadius: '0.75rem', width: '90%', maxWidth: '400px', boxShadow: 'var(--shadow-lg)' }}>
+            <h3 style={{ color: 'var(--primary)', marginBottom: '1rem', fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <FiTrash2 color="#EF4444" /> Delete Property
+            </h3>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', lineHeight: '1.5' }}>
+              Are you sure you want to delete this property? This action cannot be undone and it will be permanently removed from your active listings.
+            </p>
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+              <button 
+                onClick={cancelDeleteProperty}
+                style={{ padding: '0.5rem 1rem', borderRadius: '0.375rem', border: '1px solid var(--border-color)', backgroundColor: 'transparent', color: 'var(--text-secondary)', cursor: 'pointer', fontWeight: '500' }}
+              >
+                No, Cancel
+              </button>
+              <button 
+                onClick={confirmDeleteProperty}
+                style={{ padding: '0.5rem 1rem', borderRadius: '0.375rem', border: 'none', backgroundColor: '#EF4444', color: 'white', cursor: 'pointer', fontWeight: '500' }}
+              >
+                Yes, Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="container" style={{ display: 'flex', gap: '2rem', padding: '2rem 1.5rem', alignItems: 'flex-start' }}>
         
@@ -285,7 +373,7 @@ const AgentDashboard = () => {
                   </thead>
                   <tbody>
                     {leads.map(lead => (
-                      <tr key={lead._id} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                      <tr key={lead.id || lead._id} style={{ borderBottom: '1px solid var(--border-color)' }}>
                         <td style={{ padding: '1rem', fontWeight: '500' }}>{lead.name}</td>
                         <td style={{ padding: '1rem' }}>
                           <div style={{ fontSize: '0.875rem', color: 'var(--primary)' }}>{lead.phone}</div>
@@ -301,7 +389,7 @@ const AgentDashboard = () => {
                             <Dropdown 
                               options={leadStatusOptions}
                               value={lead.status}
-                              onChange={(val) => updateLeadStatus(lead._id, val)}
+                              onChange={(val) => updateLeadStatus(lead.id || lead._id, val)}
                             />
                           </div>
                         </td>
@@ -387,7 +475,7 @@ const AgentDashboard = () => {
                   </thead>
                   <tbody>
                     {properties.map(prop => (
-                      <tr key={prop._id} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                      <tr key={prop.id || prop._id} style={{ borderBottom: '1px solid var(--border-color)' }}>
                         <td style={{ padding: '1rem', fontWeight: '500' }}>
                           <div>{prop.title}</div>
                           <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{prop.location}</div>
@@ -395,7 +483,7 @@ const AgentDashboard = () => {
                         <td style={{ padding: '1rem', fontSize: '0.875rem' }}>{prop.propertyType}</td>
                         <td style={{ padding: '1rem', fontSize: '0.875rem', fontWeight: '600' }}>{formatPrice(prop.price)}</td>
                         <td style={{ padding: '1rem' }}>
-                          <button onClick={() => handleDeleteProperty(prop._id)} style={{ padding: '0.25rem 0.5rem', borderRadius: '0.25rem', border: 'none', backgroundColor: '#FEE2E2', color: '#991B1B', cursor: 'pointer', fontSize: '0.75rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                          <button onClick={() => requestDeleteProperty(prop.id || prop._id)} style={{ padding: '0.25rem 0.5rem', borderRadius: '0.25rem', border: 'none', backgroundColor: '#FEE2E2', color: '#991B1B', cursor: 'pointer', fontSize: '0.75rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                             <FiTrash2 /> Delete
                           </button>
                         </td>

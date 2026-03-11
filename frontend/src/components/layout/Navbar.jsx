@@ -1,21 +1,27 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FiMenu, FiX } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
+import { FiMenu, FiX, FiGlobe } from 'react-icons/fi';
+import Dropdown from '../../components/ui/Dropdown';
 import './Navbar.css';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const location = useLocation();
+  const { t, i18n } = useTranslation();
 
   const toggleMenu = () => setIsOpen(!isOpen);
   const closeMenu = () => setIsOpen(false);
 
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
+  };
+
   const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'Properties', path: '/properties' },
-    { name: 'Investment', path: '/invest' },
-    { name: 'About', path: '/about' },
-    { name: 'Contact', path: '/contact' },
+    { name: t('navbar.home'), path: '/' },
+    { name: t('navbar.properties'), path: '/properties' },
+    { name: t('navbar.investment'), path: '/invest' },
+    { name: t('navbar.about'), path: '/about' },
+    { name: t('navbar.contact'), path: '/contact' },
   ];
 
   return (
@@ -41,9 +47,25 @@ const Navbar = () => {
           </ul>
         </nav>
 
-        <div className="navbar-actions">
+        <div className="navbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          
+          <div className="language-selector" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: 'var(--text-color)', zIndex: 1000 }}>
+            <FiGlobe size={18} />
+            <div style={{ width: '130px' }}>
+              <Dropdown 
+                options={[
+                  { value: 'en', label: 'English' },
+                  { value: 'te', label: 'తెలుగు' },
+                  { value: 'hi', label: 'हिन्दी' }
+                ]}
+                value={i18n.language || 'en'}
+                onChange={(val) => changeLanguage(val)}
+              />
+            </div>
+          </div>
+
           <Link to="/contact" className="btn btn-primary cta-btn">
-            Book Site Visit
+            {t('navbar.bookVisit')}
           </Link>
           <button className="mobile-menu-btn" onClick={toggleMenu} aria-label="Toggle menu">
             {isOpen ? <FiX size={24} /> : <FiMenu size={24} />}
@@ -67,7 +89,7 @@ const Navbar = () => {
           ))}
           <li className="mobile-nav-item">
              <Link to="/contact" className="btn btn-primary" style={{ width: '100%' }} onClick={closeMenu}>
-               Book Site Visit
+               {t('navbar.bookVisit')}
              </Link>
           </li>
         </ul>

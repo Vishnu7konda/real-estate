@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import SEO from '../../components/seo/SEO';
 import Hero from '../../components/ui/Hero';
 import FeaturedProperties from '../../components/ui/FeaturedProperties';
@@ -6,6 +7,8 @@ import WhyChooseUs from '../../components/ui/WhyChooseUs';
 import InvestmentOpps from '../../components/ui/InvestmentOpps';
 
 const Home = () => {
+  const { t } = useTranslation();
+
   const schema = {
     "@context": "https://schema.org",
     "@type": "RealEstateAgent",
@@ -26,8 +29,8 @@ const Home = () => {
   return (
     <>
       <SEO 
-        title="Find Your Perfect Property Investment" 
-        description="Discover luxury villas, premium plots, and high ROI investment opportunities with Prime Estates."
+        title={t('home.seoTitle')} 
+        description={t('home.seoDescription')}
         url="https://primeestates.com"
         schema={schema}
       />

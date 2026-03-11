@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { FaWhatsapp } from 'react-icons/fa';
 import './FloatingWhatsApp.css';
 
@@ -7,7 +8,7 @@ const FloatingWhatsApp = () => {
   const message = 'Hello, I am interested in your property listings. Please share available options.';
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 
-  return (
+  return createPortal(
     <a 
       href={whatsappUrl} 
       target="_blank" 
@@ -19,7 +20,8 @@ const FloatingWhatsApp = () => {
         <FaWhatsapp className="whatsapp-icon" />
       </div>
       <span className="whatsapp-tooltip">Chat with us!</span>
-    </a>
+    </a>,
+    document.body
   );
 };
 

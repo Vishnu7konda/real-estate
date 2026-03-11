@@ -1,0 +1,194 @@
+{
+  "navbar": {
+    "home": "Home",
+    "properties": "Properties",
+    "investment": "Investment",
+    "about": "About",
+    "contact": "Contact",
+    "bookVisit": "Book Site Visit",
+    "language": "Language",
+    "adminDashboard": "Admin Dashboard"
+  },
+  "adminLogin": {
+    "title": "Agent Login",
+    "subtitle": "Secure portal for Prime Estates agents.",
+    "passwordPlaceholder": "Enter admin password",
+    "loginButton": "Login to Dashboard",
+    "verifyingButton": "Verifying...",
+    "invalidPassword": "Invalid password. Please try again."
+  },
+  "home": {
+    "seoTitle": "Find Your Perfect Property Investment",
+    "seoDescription": "Discover luxury villas, premium plots, and high ROI investment opportunities with Prime Estates."
+  },
+  "hero": {
+    "titlePart1": "Find Your Perfect ",
+    "titlePart2": "Property Investment",
+    "subtitle": "Trusted real estate guidance for plots, villas, and premium properties.",
+    "viewPropertiesBtn": "View Properties",
+    "bookVisitBtn": "Book Site Visit",
+    "searchLocationPlaceholder": "Search Location...",
+    "propertyTypePlaceholder": "Property Type",
+    "propertyTypePlot": "Plot",
+    "propertyTypeVilla": "Villa",
+    "propertyTypeApartment": "Apartment",
+    "propertyTypeCommercial": "Commercial",
+    "maxBudgetLabel": "Max Budget: ",
+    "searchBtn": "Search"
+  },
+  "featuredProperties": {
+    "title": "Featured Properties",
+    "subtitle": "Discover our hand-picked selection of premium real estate.",
+    "viewAllBtn": "View All Properties",
+    "loading": "Loading properties..."
+  },
+  "whyChooseUs": {
+    "title": "Why Choose Prime Estates",
+    "subtitle": "We don't just sell properties; we build long-term relationships based on trust, transparency, and results.",
+    "features": [
+      {
+        "title": "Verified Properties",
+        "description": "Every property undergoes a strict 50-point legal and structural verification process before listing."
+      },
+      {
+        "title": "Transparent Pricing",
+        "description": "No hidden fees. We believe in complete transparency throughout the entire transaction process."
+      },
+      {
+        "title": "Legal Assistance",
+        "description": "Our in-house legal team ensures all documentation, registrations, and titles are crystal clear."
+      },
+      {
+        "title": "Investment Guidance",
+        "description": "Data-driven insights to help you choose properties with the highest potential ROI and market growth."
+      },
+      {
+        "title": "End-to-End Support",
+        "description": "From initial property visits to handing over the keys, we manage the entire lifecycle for you."
+      }
+    ]
+  },
+  "investmentOpps": {
+    "title": "High ROI Investment Zones",
+    "subtitle": "Capitalize on the fastest-growing locations identified by our market experts.",
+    "opportunities": [
+      {
+        "title": "Emerging Tech Corridors",
+        "roi": "12-15%",
+        "description": "High demand areas driven by new tech parks and corporate relocations."
+      },
+      {
+        "title": "Upcoming Transit Hubs",
+        "roi": "15-20%",
+        "description": "Properties near upcoming metro lines and major highway expansions."
+      },
+      {
+        "title": "Luxury Waterfronts",
+        "roi": "8-10%",
+        "description": "Stable, high-value investments with premium rental yields."
+      }
+    ],
+    "viewAllBtn": "View All Opportunities",
+    "consultBtn": "Consult an Expert",
+    "expectedRoi": "Expected ROI: "
+  },
+  "propertiesPage": {
+    "seoTitle": "Browse Premium Properties",
+    "seoDescription": "Search our exclusive listings of luxury villas, apartments, and commercial spaces.",
+    "pageTitle": "Browse Properties",
+    "pageSubtitle": "Find the perfect property that matches your lifestyle and investment goals.",
+    "searchFilters": "Search Filters",
+    "locationLabel": "Location",
+    "locationPlaceholder": "City, Neighborhood...",
+    "propertyTypeLabel": "Property Type",
+    "propertyTypePlaceholder": "All Types",
+    "maxBudgetLabel": "Max Budget",
+    "applyFiltersBtn": "Apply Filters",
+    "showingResultsLeft": "Showing ",
+    "showingResultsRight": " luxurious properties",
+    "filtersBtnMobile": "Filters",
+    "loading": "Loading properties...",
+    "noResultsTitle": "No properties found",
+    "noResultsText": "Try adjusting your search filters to find what you're looking for.",
+    "clearFiltersBtn": "Clear All Filters",
+    "sortNewest": "Newest First",
+    "sortPriceLow": "Price: Low to High",
+    "sortPriceHigh": "Price: High to Low"
+  },
+  "propertyCard": {
+    "featuredBadge": "Featured",
+    "viewDetailsBtn": "View Details",
+    "whatsappPrefix": "Hi, I am interested in the "
+  },
+  "propertyDetails": {
+    "loading": "Loading property details...",
+    "notFound": "Property not found",
+    "homeBreadcrumb": "Home",
+    "propertiesBreadcrumb": "Properties",
+    "saveAria": "Save Property",
+    "shareAria": "Share Property",
+    "overviewTitle": "Overview",
+    "highlightsTitle": "Property Highlights",
+    "amenitiesTitle": "Amenities",
+    "locationTitle": "Location",
+    "contactTitle": "Interested in this property?",
+    "contactSubtitle": "Contact our experts to schedule a site visit or request more information.",
+    "namePlaceholder": "Your Name",
+    "phonePlaceholder": "Phone Number",
+    "messagePlaceholder": "I'm interested in this property...",
+    "requestDetailsBtn": "Request Details",
+    "orText": "OR",
+    "chatWhatsappBtn": "Chat on WhatsApp",
+    "scheduleVisitBtn": "Schedule Site Visit",
+    "whatsappPrefix": "Hi, I want to know more about "
+  },
+  "aboutPage": {
+    "seoTitle": "About the Agent",
+    "seoDescription": "Meet your trusted real estate advisor with over 15 years of experience in luxury and investment properties.",
+    "pageTitle": "About Prime Estates",
+    "pageSubtitle": "Your trusted partner in navigating the premium real estate market.",
+    "agentName": "Jonathan Carter",
+    "agentRole": "Founder & Lead Investment Advisor",
+    "bioPara1": "With over 15 years of dedicated experience in the premium real estate market, I have built Prime Estates on the foundation of uncompromised integrity, deep market knowledge, and an unwavering commitment to my clients' success.",
+    "bioPara2": "My approach is fundamentally different from traditional agents. I operate as a strategic investment advisor, focusing on data-driven property acquisitions that offer both exceptional lifestyle value and strong long-term yields. Whether you are looking for a forever home or expanding your investment portfolio, my team and I provide end-to-end, white-glove service.",
+    "consultationBtn": "Schedule a Consultation",
+    "statYears": "Years Experience",
+    "statSales": "in Career Sales",
+    "statFamilies": "Happy Families",
+    "valuesTitle": "Our Core Values",
+    "value1Title": "Radical Transparency",
+    "value1Desc": "We provide completely honest assessments of every property, including potential drawbacks, ensuring you always make informed decisions.",
+    "value2Title": "Client-First Approach",
+    "value2Desc": "Your long-term financial success and peace of mind are always prioritized over a quick commission. We build generational relationships.",
+    "value3Title": "Market Mastery",
+    "value3Desc": "We constantly analyze macro and micro economic data to identify emerging trends before they become mainstream knowledge."
+  },
+  "contactPage": {
+    "seoTitle": "Contact Us & Book Site Visit",
+    "seoDescription": "Get in touch with Prime Estates to schedule a site visit or request a call back.",
+    "pageTitle": "Get In Touch",
+    "pageSubtitle": "We are here to help you find your dream property.",
+    "contactInfoTitle": "Contact Information",
+    "contactInfoDesc": "Whether you have a question about a property, want to schedule a site visit, or need investment advice, our team is ready to answer all your questions.",
+    "officeAddressLabel": "Office Address",
+    "officeAddressVal": "123 Elite Realty Avenue<br />Business Park, CA 90210",
+    "phoneLabel": "Phone & WhatsApp",
+    "chatWhatsapp": "Chat on WhatsApp",
+    "emailLabel": "Email Us",
+    "formTitle": "Send us a Message",
+    "formSubtitle": "Fill out the form below and we will get back to you within 24 hours.",
+    "successTitle": "Message Sent Successfully!",
+    "successDesc": "Thank you for reaching out. One of our agents will contact you shortly.",
+    "sendAnotherBtn": "Send Another Message",
+    "nameLabelInput": "Full Name *",
+    "phoneLabelInput": "Phone Number *",
+    "emailLabelInput": "Email Address",
+    "interestedInLabel": "Interested In",
+    "maxBudgetLabel": "Max Budget *",
+    "messageLabel": "Message",
+    "messagePlaceholder": "I would like to schedule a site visit for...",
+    "errorMsg": "Failed to submit the form. Please check your connection or try again later.",
+    "submittingBtn": "Submitting...",
+    "submitBtn": "Send Message"
+  }
+}
