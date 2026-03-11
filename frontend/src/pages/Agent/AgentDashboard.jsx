@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FiUsers, FiHome, FiTrendingUp, FiLogOut, FiEdit2, FiTrash2, FiEye, FiEyeOff, FiGlobe } from 'react-icons/fi';
+import { FiUsers, FiHome, FiTrendingUp, FiLogOut, FiEdit2, FiTrash2, FiEye, FiEyeOff, FiGlobe, FiX, FiPlus } from 'react-icons/fi';
 import Dropdown from '../../components/ui/Dropdown';
 import SEO from '../../components/seo/SEO';
 import '../Properties/Properties.css';
+import './AgentDashboard.css';
 
 const AgentDashboard = () => {
   const { t, i18n } = useTranslation();
@@ -182,6 +183,32 @@ const AgentDashboard = () => {
     }
   };
 
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files);
+    const currentFiles = Array.isArray(newProp.imageFiles) ? newProp.imageFiles : [];
+    
+    // Filter out if total exceeds 7
+    const remainingSlots = 7 - currentFiles.length;
+    const allowedFiles = files.slice(0, remainingSlots);
+    
+    if (files.length > remainingSlots) {
+      alert("You can only upload up to exactly 7 images per property.");
+    }
+
+    setNewProp({
+      ...newProp,
+      imageFiles: [...currentFiles, ...allowedFiles]
+    });
+    
+    e.target.value = ''; // Reset input to allow re-uploading same file if deleted
+  };
+
+  const removeImage = (index) => {
+    const currentFiles = Array.isArray(newProp.imageFiles) ? [...newProp.imageFiles] : [];
+    currentFiles.splice(index, 1);
+    setNewProp({ ...newProp, imageFiles: currentFiles });
+  };
+
   const setMockLeads = () => {
     setLeads([
       { _id: '1', name: 'John Doe', phone: '555-0101', email: 'john@example.com', propertyType: 'Villa', budget: '₹10Cr - ₹20Cr', status: 'New', createdAt: new Date().toISOString() },
@@ -207,9 +234,9 @@ const AgentDashboard = () => {
 
   if (!isAuthenticated) {
     return (
-      <div className="section" style={{ minHeight: 'calc(100vh - 80px)', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--bg-color)' }}>
+      <div className="admin-login-wrapper">
         <SEO title={t('adminLogin.title')} />
-        <div style={{ backgroundColor: 'var(--surface)', padding: '3rem', borderRadius: '1rem', width: '100%', maxWidth: '400px', boxShadow: 'var(--shadow-lg)', textAlign: 'center' }}>
+        <div className="admin-login-card">
           <h1 style={{ color: 'var(--primary)', marginBottom: '1rem', fontSize: '2rem' }}>{t('adminLogin.title')}</h1>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>{t('adminLogin.subtitle')}</p>
           
@@ -252,9 +279,9 @@ const AgentDashboard = () => {
       <SEO title="Agent CRM Dashboard" />
       
       {/* Top Navbar for CRM */}
-      <div style={{ backgroundColor: 'var(--primary)', color: 'var(--surface)', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="admin-header">
         <h2 style={{ fontSize: '1.25rem', margin: 0 }}>Prime Estates CRM</h2>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+        <div className="admin-header-actions">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', zIndex: 1000 }}>
             <FiGlobe size={18} />
             <div style={{ width: '130px', color: '#1E293B' }}>
@@ -306,15 +333,15 @@ const AgentDashboard = () => {
         </div>
       )}
 
-      <div className="container" style={{ display: 'flex', gap: '2rem', padding: '2rem 1.5rem', alignItems: 'flex-start' }}>
+      <div className="container admin-layout">
         
         {/* Sidebar */}
-        <div style={{ width: '250px', backgroundColor: 'var(--surface)', borderRadius: '0.5rem', padding: '1.5rem', boxShadow: 'var(--shadow-sm)', flexShrink: 0 }}>
-          <ul style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        <div className="admin-sidebar">
+          <ul>
             <li>
               <button 
                 onClick={() => setActiveTab('dashboard')}
-                style={{ width: '100%', textAlign: 'left', padding: '0.75rem 1rem', borderRadius: '0.375rem', border: 'none', display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', backgroundColor: activeTab === 'dashboard' ? 'var(--bg-color)' : 'transparent', color: activeTab === 'dashboard' ? 'var(--primary)' : 'var(--text-secondary)', fontWeight: activeTab === 'dashboard' ? '600' : '400' }}
+                className={`admin-tab-btn ${activeTab === 'dashboard' ? 'active' : 'inactive'}`}
               >
                 <FiTrendingUp /> Overview
               </button>
@@ -322,7 +349,7 @@ const AgentDashboard = () => {
             <li>
               <button 
                 onClick={() => setActiveTab('leads')}
-                style={{ width: '100%', textAlign: 'left', padding: '0.75rem 1rem', borderRadius: '0.375rem', border: 'none', display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', backgroundColor: activeTab === 'leads' ? 'var(--bg-color)' : 'transparent', color: activeTab === 'leads' ? 'var(--primary)' : 'var(--text-secondary)', fontWeight: activeTab === 'leads' ? '600' : '400' }}
+                className={`admin-tab-btn ${activeTab === 'leads' ? 'active' : 'inactive'}`}
               >
                 <FiUsers /> Manage Leads
               </button>
@@ -330,7 +357,7 @@ const AgentDashboard = () => {
             <li>
               <button 
                 onClick={() => setActiveTab('properties')}
-                style={{ width: '100%', textAlign: 'left', padding: '0.75rem 1rem', borderRadius: '0.375rem', border: 'none', display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', backgroundColor: activeTab === 'properties' ? 'var(--bg-color)' : 'transparent', color: activeTab === 'properties' ? 'var(--primary)' : 'var(--text-secondary)', fontWeight: activeTab === 'properties' ? '600' : '400' }}
+                className={`admin-tab-btn ${activeTab === 'properties' ? 'active' : 'inactive'}`}
               >
                 <FiHome /> Properties
               </button>
@@ -339,14 +366,16 @@ const AgentDashboard = () => {
         </div>
 
         {/* Main Content Area */}
-        <div style={{ flexGrow: 1, backgroundColor: 'var(--surface)', borderRadius: '0.5rem', padding: '2rem', boxShadow: 'var(--shadow-sm)', minHeight: '600px', overflowX: 'auto' }}>
+        <div className="admin-main">
           
           {activeTab === 'dashboard' && (
             <div>
-              <h3 style={{ fontSize: '1.5rem', color: 'var(--primary)', marginBottom: '1.5rem' }}>Dashboard Overview</h3>
+              <div className="admin-section-header">
+                <h3>Dashboard Overview</h3>
+              </div>
               <p style={{ color: 'var(--text-secondary)' }}>Welcome back. Here is a quick snapshot of your CRM.</p>
               
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginTop: '2rem' }}>
+              <div className="dashboard-stats-grid">
                 <div style={{ padding: '1.5rem', backgroundColor: '#f8fafc', borderRadius: '0.5rem', borderLeft: '4px solid var(--secondary)' }}>
                   <div style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginBottom: '0.5rem' }}>Total Leads</div>
                   <div style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--primary)' }}>{leads.length}</div>
@@ -361,64 +390,66 @@ const AgentDashboard = () => {
 
           {activeTab === 'leads' && (
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                <h3 style={{ fontSize: '1.5rem', color: 'var(--primary)' }}>Lead Management</h3>
+              <div className="admin-section-header">
+                <h3>Lead Management</h3>
                 <button className="btn btn-outline" onClick={fetchLeads}>Refresh</button>
               </div>
 
               {loading ? (
                 <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-secondary)' }}>Loading leads...</div>
               ) : (
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                  <thead>
-                    <tr style={{ borderBottom: '2px solid var(--border-color)', color: 'var(--text-secondary)' }}>
-                      <th style={{ padding: '1rem', fontWeight: '600' }}>Name</th>
-                      <th style={{ padding: '1rem', fontWeight: '600' }}>Contact</th>
-                      <th style={{ padding: '1rem', fontWeight: '600' }}>Interest</th>
-                      <th style={{ padding: '1rem', fontWeight: '600' }}>Budget</th>
-                      <th style={{ padding: '1rem', fontWeight: '600' }}>Date</th>
-                      <th style={{ padding: '1rem', fontWeight: '600' }}>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {leads.map(lead => (
-                      <tr key={lead.id || lead._id} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                        <td style={{ padding: '1rem', fontWeight: '500' }}>{lead.name}</td>
-                        <td style={{ padding: '1rem' }}>
-                          <div style={{ fontSize: '0.875rem', color: 'var(--primary)' }}>{lead.phone}</div>
-                          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{lead.email}</div>
-                        </td>
-                        <td style={{ padding: '1rem', fontSize: '0.875rem' }}>{lead.propertyType}</td>
-                        <td style={{ padding: '1rem', fontSize: '0.875rem' }}>{lead.budget}</td>
-                        <td style={{ padding: '1rem', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-                          {new Date(lead.createdAt).toLocaleDateString()}
-                        </td>
-                        <td style={{ padding: '1rem' }}>
-                          <div style={{ width: '130px' }}>
-                            <Dropdown 
-                              options={leadStatusOptions}
-                              value={lead.status}
-                              onChange={(val) => updateLeadStatus(lead.id || lead._id, val)}
-                            />
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                    {leads.length === 0 && (
+                <div className="admin-table-container">
+                  <table className="admin-table">
+                    <thead>
                       <tr>
-                        <td colSpan="6" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>No leads found.</td>
+                        <th>Name</th>
+                        <th>Contact</th>
+                        <th>Interest</th>
+                        <th>Budget</th>
+                        <th>Date</th>
+                        <th>Status</th>
                       </tr>
-                    )}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {leads.map(lead => (
+                        <tr key={lead.id || lead._id}>
+                          <td data-label="Name" style={{ fontWeight: '500' }}>{lead.name}</td>
+                          <td data-label="Contact">
+                            <div style={{ fontSize: '0.875rem', color: 'var(--primary)' }}>{lead.phone}</div>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{lead.email}</div>
+                          </td>
+                          <td data-label="Interest" style={{ fontSize: '0.875rem' }}>{lead.propertyType}</td>
+                          <td data-label="Budget" style={{ fontSize: '0.875rem' }}>{lead.budget}</td>
+                          <td data-label="Date" style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                            {new Date(lead.createdAt).toLocaleDateString()}
+                          </td>
+                          <td data-label="Status">
+                            <div style={{ width: '130px' }}>
+                              <Dropdown 
+                                options={leadStatusOptions}
+                                value={lead.status}
+                                onChange={(val) => updateLeadStatus(lead.id || lead._id, val)}
+                              />
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                      {leads.length === 0 && (
+                        <tr>
+                          <td colSpan="6" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>No leads found.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </div>
           )}
 
           {activeTab === 'properties' && (
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                <h3 style={{ fontSize: '1.5rem', color: 'var(--primary)' }}>Property Management</h3>
+              <div className="admin-section-header">
+                <h3>Property Management</h3>
                 <button className="btn btn-primary" onClick={() => setShowAddProp(!showAddProp)}>
                   {showAddProp ? 'Cancel' : '+ Add Property'}
                 </button>
@@ -428,7 +459,7 @@ const AgentDashboard = () => {
                 <div style={{ padding: '2rem', backgroundColor: '#f8fafc', borderRadius: '0.5rem', marginBottom: '2rem' }}>
                   <h4 style={{ marginBottom: '1rem', color: 'var(--primary)' }}>Add New Property</h4>
                   <form onSubmit={handleAddProperty} style={{ display: 'grid', gap: '1rem' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div className="prop-form-grid-2">
                       <input type="text" placeholder="Title" required className="input-field" value={newProp.title} onChange={e => setNewProp({...newProp, title: e.target.value})} />
                       <div>
                         <input type="number" placeholder="Price Contextual (INR)" required className="input-field" value={newProp.price} onChange={e => setNewProp({...newProp, price: e.target.value})} />
@@ -436,7 +467,7 @@ const AgentDashboard = () => {
                       </div>
                     </div>
                     <input type="text" placeholder="Location" required className="input-field" value={newProp.location} onChange={e => setNewProp({...newProp, location: e.target.value})} />
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+                    <div className="prop-form-grid-3">
                       <Dropdown 
                         options={propertyTypeOptions}
                         value={newProp.propertyType}
@@ -453,19 +484,53 @@ const AgentDashboard = () => {
                     </div>
                     <textarea placeholder="Description" required className="input-field" rows="3" value={newProp.description} onChange={e => setNewProp({...newProp, description: e.target.value})}></textarea>
                     
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', alignItems: 'center' }}>
-                      <div>
-                        <label style={{display: 'block', fontSize: '0.875rem', marginBottom: '0.25rem', color: 'var(--text-secondary)'}}>Upload Property Images</label>
-                        <input type="file" multiple accept="image/*" onChange={(e) => setNewProp({...newProp, imageFiles: e.target.files})} className="input-field" />
+                    <div style={{ marginTop: '1rem', borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
+                      <label style={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', fontSize: '0.875rem', marginBottom: '0.5rem', color: 'var(--primary)', fontWeight: '600'}}>
+                        <span>Property Image Slots (Max 7)</span>
+                        <span style={{ fontSize: '0.75rem', color: newProp.imageFiles.length >= 7 ? 'var(--error)' : 'var(--text-secondary)' }}>{newProp.imageFiles.length} / 7 Uploaded</span>
+                      </label>
+                      <div className="image-upload-grid">
+                        {[...Array(7)].map((_, index) => {
+                          const file = newProp.imageFiles[index];
+                          const previewUrl = file ? URL.createObjectURL(file) : null;
+                          
+                          return (
+                            <div key={index} className="image-upload-slot" onClick={() => !file && document.getElementById('property-image-upload').click()}>
+                              {file ? (
+                                <>
+                                  <img src={previewUrl} alt={`Upload ${index + 1}`} />
+                                  <button type="button" className="image-remove-btn" onClick={(e) => { e.stopPropagation(); removeImage(index); }}>
+                                    <FiX size={14} />
+                                  </button>
+                                </>
+                              ) : (
+                                <>
+                                  <FiPlus size={24} color="var(--text-secondary)" />
+                                  <div className="image-upload-placeholder">Slot {index + 1}</div>
+                                </>
+                              )}
+                            </div>
+                          );
+                        })}
                       </div>
-                      <div>
-                        <label style={{display: 'block', fontSize: '0.875rem', marginBottom: '0.25rem', color: 'var(--text-secondary)'}}>Or Provide External Image URLs</label>
-                        <input type="text" placeholder="Image URLs (comma separated)" className="input-field" value={newProp.images} onChange={e => setNewProp({...newProp, images: e.target.value})} />
-                      </div>
+                      <input 
+                        id="property-image-upload"
+                        type="file" 
+                        multiple 
+                        accept="image/*" 
+                        onChange={handleImageChange} 
+                        style={{ display: 'none' }} 
+                        disabled={newProp.imageFiles.length >= 7}
+                      />
+                    </div>
+                    
+                    <div style={{ marginTop: '1rem', marginBottom: '1rem' }}>
+                      <label style={{display: 'block', fontSize: '0.875rem', marginBottom: '0.25rem', color: 'var(--text-secondary)'}}>Or Provide External Image URLs (Fallback)</label>
+                      <input type="text" placeholder="Image URLs (comma separated)" className="input-field" value={newProp.images} onChange={e => setNewProp({...newProp, images: e.target.value})} />
                     </div>
                     
                     <input type="text" placeholder="Amenities (comma separated)" className="input-field" value={newProp.amenities} onChange={e => setNewProp({...newProp, amenities: e.target.value})} />
-                    <button type="submit" className="btn btn-primary" style={{ width: 'fit-content' }}>Save Property</button>
+                    <button type="submit" className="btn btn-primary" style={{ width: 'fit-content', marginTop: '1rem' }}>Save Property</button>
                   </form>
                 </div>
               )}
@@ -473,38 +538,40 @@ const AgentDashboard = () => {
               {propLoading ? (
                 <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-secondary)' }}>Loading properties...</div>
               ) : (
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                  <thead>
-                    <tr style={{ borderBottom: '2px solid var(--border-color)', color: 'var(--text-secondary)' }}>
-                      <th style={{ padding: '1rem', fontWeight: '600' }}>Property</th>
-                      <th style={{ padding: '1rem', fontWeight: '600' }}>Type</th>
-                      <th style={{ padding: '1rem', fontWeight: '600' }}>Price</th>
-                      <th style={{ padding: '1rem', fontWeight: '600' }}>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {properties.map(prop => (
-                      <tr key={prop.id || prop._id} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                        <td style={{ padding: '1rem', fontWeight: '500' }}>
-                          <div>{prop.title}</div>
-                          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{prop.location}</div>
-                        </td>
-                        <td style={{ padding: '1rem', fontSize: '0.875rem' }}>{prop.propertyType}</td>
-                        <td style={{ padding: '1rem', fontSize: '0.875rem', fontWeight: '600' }}>{formatPrice(prop.price)}</td>
-                        <td style={{ padding: '1rem' }}>
-                          <button onClick={() => requestDeleteProperty(prop.id || prop._id)} style={{ padding: '0.25rem 0.5rem', borderRadius: '0.25rem', border: 'none', backgroundColor: '#FEE2E2', color: '#991B1B', cursor: 'pointer', fontSize: '0.75rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                            <FiTrash2 /> Delete
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                    {properties.length === 0 && (
+                <div className="admin-table-container">
+                  <table className="admin-table">
+                    <thead>
                       <tr>
-                        <td colSpan="4" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>No properties added yet.</td>
+                        <th>Property</th>
+                        <th>Type</th>
+                        <th>Price</th>
+                        <th>Actions</th>
                       </tr>
-                    )}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {properties.map(prop => (
+                        <tr key={prop.id || prop._id}>
+                          <td data-label="Property" style={{ fontWeight: '500' }}>
+                            <div>{prop.title}</div>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{prop.location}</div>
+                          </td>
+                          <td data-label="Type" style={{ fontSize: '0.875rem' }}>{prop.propertyType}</td>
+                          <td data-label="Price" style={{ fontSize: '0.875rem', fontWeight: '600' }}>{formatPrice(prop.price)}</td>
+                          <td data-label="Actions">
+                            <button onClick={() => requestDeleteProperty(prop.id || prop._id)} style={{ padding: '0.35rem 0.75rem', borderRadius: '0.25rem', border: 'none', backgroundColor: '#FEE2E2', color: '#991B1B', cursor: 'pointer', fontSize: '0.75rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.25rem', width: 'fit-content' }}>
+                              <FiTrash2 /> Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                      {properties.length === 0 && (
+                        <tr>
+                          <td colSpan="4" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>No properties added yet.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </div>
           )}

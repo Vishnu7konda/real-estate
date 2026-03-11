@@ -49,7 +49,7 @@ const Navbar = () => {
 
         <div className="navbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           
-          <div className="language-selector" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: 'var(--text-color)', zIndex: 1000 }}>
+          <div className="language-selector desktop-only" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: 'var(--text-color)', zIndex: 1000 }}>
             <FiGlobe size={18} />
             <div style={{ width: '130px' }}>
               <Dropdown 
@@ -87,6 +87,20 @@ const Navbar = () => {
               </Link>
             </li>
           ))}
+          <li className="mobile-nav-item" style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '0.5rem', zIndex: 1000 }}>
+            <FiGlobe size={18} color="var(--primary)" />
+            <div style={{ width: '100%', maxWidth: '200px' }}>
+              <Dropdown 
+                options={[
+                  { value: 'en', label: 'English' },
+                  { value: 'te', label: 'తెలుగు' },
+                  { value: 'hi', label: 'हिन्दी' }
+                ]}
+                value={i18n.language || 'en'}
+                onChange={(val) => { changeLanguage(val); closeMenu(); }}
+              />
+            </div>
+          </li>
           <li className="mobile-nav-item">
              <Link to="/contact" className="btn btn-primary" style={{ width: '100%' }} onClick={closeMenu}>
                {t('navbar.bookVisit')}

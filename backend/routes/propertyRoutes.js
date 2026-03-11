@@ -5,7 +5,7 @@ import upload from '../middleware/upload.js';
 
 const router = express.Router();
 
-const mUpload = upload.array('images', 5);
+const mUpload = upload.array('images', 7);
 const handleUpload = (req, res, next) => {
   mUpload(req, res, function (err) {
     if (err instanceof multer.MulterError) {

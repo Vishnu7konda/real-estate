@@ -45,7 +45,7 @@ const FeaturedProperties = () => {
         ) : (
           <div className="properties-grid">
             {properties.map(property => (
-              <PropertyCard key={property._id} property={property} />
+              <PropertyCard key={property.id || property._id} property={property} />
             ))}
           </div>
         )}

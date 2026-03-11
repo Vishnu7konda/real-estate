@@ -3,6 +3,8 @@
   color: var(--text-light);
   padding-top: 5rem;
   margin-top: auto;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
 .footer-container {
