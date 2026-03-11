@@ -18,7 +18,7 @@ const PropertyCard = ({ property }) => {
 
   const handleWhatsApp = (e) => {
     e.preventDefault();
-    const phoneNumber = '1234567890'; // Replace with agent's actual number
+    const phoneNumber = "919866081506"; // In reality this would come from agent profile
     const message = `${t('propertyCard.whatsappPrefix')}${property.title} located at ${property.location} listed for ${formatPrice(property.price)}. Please provide more details.`;
     window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, '_blank');
   };

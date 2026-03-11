@@ -229,7 +229,7 @@ const PropertyDetails = () => {
                 <div className="separator"><span>{t('propertyDetails.orText')}</span></div>
 
                 <a 
-                  href={`https://wa.me/1234567890?text=${encodeURIComponent(`${t('propertyDetails.whatsappPrefix')}${property.title} listed for ${formatPrice(property.price)}.`)}`}
+                  href={`https://wa.me/919866081506?text=${encodeURIComponent(`${t('propertyDetails.whatsappPrefix')}${property.title} listed for ${formatPrice(property.price)}.`)}`}
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="btn whatsapp-btn"

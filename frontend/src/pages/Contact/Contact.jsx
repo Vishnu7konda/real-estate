@@ -110,8 +110,8 @@ const Contact = () => {
                   </div>
                   <div>
                     <h3 style={{ fontSize: '1.125rem', marginBottom: '0.25rem' }}>{t('contactPage.phoneLabel')}</h3>
-                    <p style={{ color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>+1 (555) 123-4567</p>
-                    <a href="https://wa.me/1234567890" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: '#25D366', fontWeight: '500' }}>
+                    <p style={{ color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>+91 98660 81506</p>
+                    <a href="https://wa.me/919866081506" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: '#25D366', fontWeight: '500' }}>
                       <FaWhatsapp /> {t('contactPage.chatWhatsapp')}
                     </a>
                   </div>
