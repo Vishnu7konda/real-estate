@@ -18,7 +18,7 @@ const Properties = () => {
   const [filters, setFilters] = useState({
     location: searchParams.get('location') || '',
     propertyType: searchParams.get('propertyType') || '',
-    budget: searchParams.get('budget') || '50000000',
+    budget: searchParams.get('budget') || '',
     sort: 'newest'
   });
 
@@ -141,19 +141,29 @@ const Properties = () => {
             <div className="filter-group">
               <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 {t('propertiesPage.maxBudgetLabel')}
-                <span style={{ color: 'var(--primary)', fontWeight: '600' }}>{formatBudget(filters.budget)}</span>
+                <span style={{ color: 'var(--primary)', fontWeight: '600' }}>
+                  {filters.budget ? formatBudget(filters.budget) : 'All'}
+                </span>
               </label>
               <input 
                 type="range" 
                 name="budget" 
                 min="1000000" 
-                max="50000000" 
+                max="250000000" 
                 step="1000000"
                 className="input-field"
                 style={{ padding: '0', cursor: 'ew-resize', accentColor: 'var(--secondary)', border: 'none' }}
-                value={filters.budget}
+                value={filters.budget || '250000000'}
                 onChange={handleFilterChange}
               />
+              {filters.budget && (
+                <button 
+                  style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--text-secondary)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+                  onClick={() => setFilters({ ...filters, budget: '' })}
+                >
+                  Clear budget filter
+                </button>
+              )}
             </div>
 
             <button className="btn btn-primary" style={{ width: '100%' }}>
